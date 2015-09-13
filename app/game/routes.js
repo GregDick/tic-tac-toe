@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
-var game = require('./game/routes')
+var ctrl = require('./controller');
 
-router.use('/', game);
+router.get('/', ctrl.index);
 
 module.exports = router;
