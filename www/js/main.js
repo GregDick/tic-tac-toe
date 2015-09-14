@@ -1,7 +1,9 @@
 var turn = 'X';
 var winner;
 var $squares = $('.square');
+var $playAgain = $('#playAgain');
 
+// =====================GAME LOGIC========================
 
 function game () {
   var board = readBoard();
@@ -23,14 +25,15 @@ function game () {
 
 function checkForWin (board) {
   //there are 8 winning patterns
-  //if three in a row
-  //return 'X' or 'O'
-  //else return null
+  //checkForThree with each pattern
   var isItOver = checkForThree(board, 0, 1, 2) || checkForThree(board, 3, 4, 5) || checkForThree(board, 6, 7, 8) || checkForThree(board, 0, 3, 6) || checkForThree(board, 1, 4, 7) || checkForThree(board, 2, 5, 8)|| checkForThree(board, 0, 4, 8) || checkForThree(board, 2, 4, 6);
   return isItOver;
 };
 
 function checkForThree (board, x, y, z) {
+  //if three in a row
+  //return who wins and the winning play
+  //else return null
   if(board[x] && board[x] === board[y] && board[y] === board[z]){
     return {
       who : board[x],
@@ -65,10 +68,39 @@ function gameOver (winner) {
   $($squares[winner.how[1]]).addClass('win');
   $($squares[winner.how[2]]).addClass('win');
   winner.who = winner.who === 1 ? 'X' : 'O';
-  $('.winner').append('<h1>' + winner.who + ' wins! Play again?</h1>')
+  $('.winner').append('<span class="h1">' + winner.who + ' wins!</span>');
+  $('.winner').append('<button id="playAgain" class="btn btn-default">Play Again?</button>');
 }
 
 
 //play ball
 game(turn);
+
+$('.winner').on('click', 'button', function () {
+  $('.winner').empty();
+  $squares.each(function (i, square) {
+    $(square).removeClass('win');
+    $(square).empty();
+  });
+  winner = null;
+  turn = 'X';
+  game(turn);
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
