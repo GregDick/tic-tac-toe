@@ -1,4 +1,4 @@
-var turn = 'X';
+var turn = 'O';
 var winner;
 var $squares = $('.square');
 var $playAgain = $('#playAgain');
@@ -8,18 +8,31 @@ var $playAgain = $('#playAgain');
 function game () {
   var board = readBoard();
   winner = checkForWin(board);
-  console.log(winner);
   if(winner){
     gameOver(winner);
     return winner;
   }else{
     turn = turn === 'X' ? 'O' : 'X';
-    $squares.click(turn, function () {
-      if(!$(this).text()){
-        $(this).text(turn);
-        game();
-      }
-    });
+    //based on turn
+    //allow for user to click
+    //or make a call to opponent API
+    if(turn === 'X'){
+      $squares.click(turn, function () {
+        if(!$(this).text()){
+          $(this).text(turn);
+          game();
+        }
+      });
+    }else{
+      // remove click handler from squares during opponent turn
+      $squares.off();
+      $.get('/random', {board : board})
+        .done(function(data){
+          console.log(data);
+          game();
+        });
+    }
+
   }
 };
 
@@ -63,10 +76,13 @@ function readBoard () {
 }
 
 function gameOver (winner) {
+  //remove click handler from all squares
   $squares.off();
+  //highlight winning move
   $($squares[winner.how[0]]).addClass('win');
   $($squares[winner.how[1]]).addClass('win');
   $($squares[winner.how[2]]).addClass('win');
+  //display who won and playAgain button
   winner.who = winner.who === 1 ? 'X' : 'O';
   $('.winner').append('<span class="h1">' + winner.who + ' wins!</span>');
   $('.winner').append('<button id="playAgain" class="btn btn-default">Play Again?</button>');
@@ -76,6 +92,7 @@ function gameOver (winner) {
 //play ball
 game(turn);
 
+//playAgain click
 $('.winner').on('click', 'button', function () {
   $('.winner').empty();
   $squares.each(function (i, square) {
@@ -85,7 +102,7 @@ $('.winner').on('click', 'button', function () {
   winner = null;
   turn = 'X';
   game(turn);
-})
+});
 
 
 

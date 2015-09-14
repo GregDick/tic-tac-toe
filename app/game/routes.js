@@ -5,4 +5,6 @@ var ctrl = require('./controller');
 
 router.get('/', ctrl.index);
 
+router.get('/random', ctrl.random);
+
 module.exports = router;
