@@ -1,4 +1,15 @@
+var path = require('path');
+var client = require(path.join(process.cwd(), '/www/lib/postgres'));
+
 module.exports.index = function (req, res) {
+
+  client.connect(function(err) {
+    if(err) {
+      return console.error('could not connect to postgres', err);
+    }
+    else{console.log('connected')}
+  });
+
   res.render('views/index');
 };
 
