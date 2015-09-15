@@ -1,4 +1,4 @@
-var turn = 'O';
+var turn = 'X';
 var winner;
 var $squares = $('.square');
 var $playAgain = $('#playAgain');
@@ -12,7 +12,6 @@ function game () {
     gameOver(winner);
     return winner;
   }else{
-    turn = turn === 'X' ? 'O' : 'X';
     //based on turn
     //allow for user to click
     //or make a call to opponent API
@@ -20,15 +19,17 @@ function game () {
       $squares.click(turn, function () {
         if(!$(this).text()){
           $(this).text(turn);
+          turn = turn === 'X' ? 'O' : 'X';
           game();
         }
       });
     }else{
-      // remove click handler from squares during opponent turn
-      $squares.off();
+      $squares.off(); // remove click handler from squares during opponent turn
       $.get('/random', {board : board})
-        .done(function(data){
-          console.log(data);
+        .done(function(res){
+          console.log(res.move);
+          $($squares[res.move]).text(turn);
+          turn = turn === 'X' ? 'O' : 'X';
           game();
         });
     }
@@ -40,6 +41,10 @@ function checkForWin (board) {
   //there are 8 winning patterns
   //checkForThree with each pattern
   var isItOver = checkForThree(board, 0, 1, 2) || checkForThree(board, 3, 4, 5) || checkForThree(board, 6, 7, 8) || checkForThree(board, 0, 3, 6) || checkForThree(board, 1, 4, 7) || checkForThree(board, 2, 5, 8)|| checkForThree(board, 0, 4, 8) || checkForThree(board, 2, 4, 6);
+  //check for draw
+  if(!isItOver && board.indexOf(0) === -1){
+    isItOver = 'draw';
+  }
   return isItOver;
 };
 
@@ -78,13 +83,17 @@ function readBoard () {
 function gameOver (winner) {
   //remove click handler from all squares
   $squares.off();
-  //highlight winning move
-  $($squares[winner.how[0]]).addClass('win');
-  $($squares[winner.how[1]]).addClass('win');
-  $($squares[winner.how[2]]).addClass('win');
-  //display who won and playAgain button
-  winner.who = winner.who === 1 ? 'X' : 'O';
-  $('.winner').append('<span class="h1">' + winner.who + ' wins!</span>');
+  //if there is a winner, show winner and how they won
+  if(winner.who){
+    //highlight winning move
+    $($squares[winner.how[0]]).addClass('win');
+    $($squares[winner.how[1]]).addClass('win');
+    $($squares[winner.how[2]]).addClass('win');
+    //display who won and playAgain button
+    winner.who = winner.who === 1 ? 'X' : 'O';
+    $('.winner').append('<span class="h1">' + winner.who + ' wins!</span>');
+  }
+  //either way append the playAgain button
   $('.winner').append('<button id="playAgain" class="btn btn-default">Play Again?</button>');
 }
 
