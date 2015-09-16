@@ -13,6 +13,8 @@ module.exports.index = function (req, res) {
     else{console.log('connected')}
   });
 
+  createTable();
+
   res.render('views/index');
 };
 
@@ -20,7 +22,6 @@ module.exports.random = function (req, res) {
   //read board and put in DB
   var board = req.query.board;
 
-  createTable();
 
   logGameState(board);
 
@@ -30,6 +31,7 @@ module.exports.random = function (req, res) {
     }
     console.log(result.rows);
   });
+  //client.end() ????
   //find empty spaces
   var emptySpaces = [];
   board.forEach(function (space, i) {

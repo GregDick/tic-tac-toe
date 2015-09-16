@@ -7,7 +7,6 @@ router.get('/', ctrl.index);
 
 //middleware
 router.use(function (req, res, next) {
-  console.log('stopped here');
   next();
 });
 

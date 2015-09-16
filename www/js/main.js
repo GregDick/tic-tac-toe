@@ -1,7 +1,11 @@
-var turn = 'X';
+var turn  = 'X';
 var winner;
-var $squares = $('.square');
-var $playAgain = $('#playAgain');
+var xWins = 0;
+var oWins = 0;
+var tie   = 0;
+var gameCounter = 0;
+var $squares    = $('.square');
+var $playAgain  = $('#playAgain');
 
 // =====================GAME LOGIC========================
 
@@ -9,14 +13,15 @@ function game () {
   var board = readBoard();
   winner = checkForWin(board);
   if(winner){
-    gameOver(winner);
+    gameCounter++;
+    logResults(winner, gameCounter);
     return winner;
   }else{
     //based on turn
     //allow for user to click
     //or make a call to opponent API
     if(turn === 'X'){
-      userTurn();
+      randomTurn(board);
     }else{
       randomTurn(board);
     }
@@ -87,7 +92,6 @@ function randomTurn (board) {
   $squares.off(); // remove click handler from squares during opponent turn
   $.get('/random', {board : board})
     .done(function(res){
-      console.log(res.move);
       $($squares[res.move]).text(turn);
       turn = turn === 'X' ? 'O' : 'X';
       game();
@@ -97,7 +101,7 @@ function randomTurn (board) {
 
 // =====================AFTER GAME LOGIC========================
 
-function gameOver (winner) {
+function userGameOver (winner) {
   //remove click handler from all squares
   $squares.off();
   //if there is a winner, show winner and how they won
@@ -114,17 +118,44 @@ function gameOver (winner) {
   $('.winner').append('<button id="playAgain" class="btn btn-default">Play Again?</button>');
 }
 
-//playAgain click
-$('.winner').on('click', 'button', function () {
-  $('.winner').empty();
+function resetGameValues (argument) {
   $squares.each(function (i, square) {
     $(square).removeClass('win');
     $(square).empty();
   });
   winner = null;
   turn = 'X';
-  game(turn);
+}
+
+//playAgain click handler
+$('.winner').on('click', 'button', function () {
+  $('.winner').empty();
+  resetGameValues();
+  game();
 });
+
+function logResults (winner, gameCounter) {
+  //increment the winner
+  if(winner.who === 1){
+    xWins++;
+  }else if(winner.who === -1){
+    oWins++;
+  }else{
+    tie++;
+  };
+  //loop until gameCounter exceeds value
+  if (gameCounter < 100) {
+    resetGameValues();
+    game();
+  }else{
+    console.log('x', xWins);
+    console.log('o', oWins);
+    console.log('tie', tie);
+    console.log('games', gameCounter);
+  }
+}
+
+// =====================LOOP GAME========================
 
 
 
