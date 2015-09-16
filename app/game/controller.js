@@ -6,7 +6,7 @@ var async = require('async');
 
 module.exports.index = function (req, res) {
 
-  client.connect(function(err) {if (true) {};
+  client.connect(function(err) {
     if(err) {
       return console.error('could not connect to postgres', err);
     }
