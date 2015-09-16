@@ -16,22 +16,9 @@ function game () {
     //allow for user to click
     //or make a call to opponent API
     if(turn === 'X'){
-      $squares.click(turn, function () {
-        if(!$(this).text()){
-          $(this).text(turn);
-          turn = turn === 'X' ? 'O' : 'X';
-          game();
-        }
-      });
+      userTurn();
     }else{
-      $squares.off(); // remove click handler from squares during opponent turn
-      $.get('/random', {board : board})
-        .done(function(res){
-          console.log(res.move);
-          $($squares[res.move]).text(turn);
-          turn = turn === 'X' ? 'O' : 'X';
-          game();
-        });
+      randomTurn(board);
     }
 
   }
@@ -80,6 +67,36 @@ function readBoard () {
   return map;
 }
 
+//play ball
+game(turn);
+
+
+// =====================PLAYER LOGIC========================
+
+function userTurn () {
+  $squares.click(turn, function () {
+    if(!$(this).text()){
+      $(this).text(turn);
+      turn = turn === 'X' ? 'O' : 'X';
+      game();
+    }
+  });
+}
+
+function randomTurn (board) {
+  $squares.off(); // remove click handler from squares during opponent turn
+  $.get('/random', {board : board})
+    .done(function(res){
+      console.log(res.move);
+      $($squares[res.move]).text(turn);
+      turn = turn === 'X' ? 'O' : 'X';
+      game();
+    });
+}
+
+
+// =====================AFTER GAME LOGIC========================
+
 function gameOver (winner) {
   //remove click handler from all squares
   $squares.off();
@@ -96,10 +113,6 @@ function gameOver (winner) {
   //either way append the playAgain button
   $('.winner').append('<button id="playAgain" class="btn btn-default">Play Again?</button>');
 }
-
-
-//play ball
-game(turn);
 
 //playAgain click
 $('.winner').on('click', 'button', function () {
