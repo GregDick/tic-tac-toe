@@ -1,31 +1,35 @@
-var turn  = 'X';
-var winner;
-var xWins = 0;
-var oWins = 0;
-var tie   = 0;
-var gameCounter = 0;
-var $squares    = $('.square');
-var $playAgain  = $('#playAgain');
+var winner = null;
+var turn   = 'X';
+var board;
+var xWins  = 0;
+var oWins  = 0;
+var tie    = 0;
+var numberOfGames = 10;
+var gameCounter   = 0;
+var turnCounter   = 0;
+//jQuery selectors
+var $squares      = $('.square');
+var $playAgain    = $('#playAgain');
 
-// =====================GAME LOGIC========================
+// ===================== GAME ========================
 
 function game () {
-  var board = readBoard();
-  winner = checkForWin(board);
-  if(winner){
+  board = readBoard();
+  if(winner !== null){
+    // userGameOver(winner);
     gameCounter++;
     logResults(winner, gameCounter);
-    return winner;
   }else{
+    turnCounter++;
     //based on turn
     //allow for user to click
     //or make a call to opponent API
     if(turn === 'X'){
-      randomTurn(board);
+      randomTurn(board, turnCounter);
+      // userTurn();
     }else{
-      randomTurn(board);
+      randomTurn(board, turnCounter);
     }
-
   }
 };
 
@@ -35,7 +39,9 @@ function checkForWin (board) {
   var isItOver = checkForThree(board, 0, 1, 2) || checkForThree(board, 3, 4, 5) || checkForThree(board, 6, 7, 8) || checkForThree(board, 0, 3, 6) || checkForThree(board, 1, 4, 7) || checkForThree(board, 2, 5, 8)|| checkForThree(board, 0, 4, 8) || checkForThree(board, 2, 4, 6);
   //check for draw
   if(!isItOver && board.indexOf(0) === -1){
-    isItOver = 'draw';
+    isItOver = {
+      who : 0
+    };
   }
   return isItOver;
 };
@@ -73,10 +79,10 @@ function readBoard () {
 }
 
 //play ball
-game(turn);
+game();
 
 
-// =====================PLAYER LOGIC========================
+// ===================== PLAYERS ========================
 
 function userTurn () {
   $squares.click(turn, function () {
@@ -88,18 +94,20 @@ function userTurn () {
   });
 }
 
-function randomTurn (board) {
+function randomTurn (board, turnCounter) {
   $squares.off(); // remove click handler from squares during opponent turn
   $.get('/random', {board : board})
     .done(function(res){
       $($squares[res.move]).text(turn);
       turn = turn === 'X' ? 'O' : 'X';
-      game();
+      board = readBoard();
+      winner = checkForWin(board);
+      postBoard(board, turnCounter);
     });
 }
 
 
-// =====================AFTER GAME LOGIC========================
+// ===================== AFTER GAME ========================
 
 function userGameOver (winner) {
   //remove click handler from all squares
@@ -118,11 +126,12 @@ function userGameOver (winner) {
   $('.winner').append('<button id="playAgain" class="btn btn-default">Play Again?</button>');
 }
 
-function resetGameValues (argument) {
+function resetGameValues () {
   $squares.each(function (i, square) {
     $(square).removeClass('win');
     $(square).empty();
   });
+  turnCounter = 0;
   winner = null;
   turn = 'X';
 }
@@ -134,6 +143,8 @@ $('.winner').on('click', 'button', function () {
   game();
 });
 
+// ===================== LOOP GAME========================
+
 function logResults (winner, gameCounter) {
   //increment the winner
   if(winner.who === 1){
@@ -143,28 +154,38 @@ function logResults (winner, gameCounter) {
   }else{
     tie++;
   };
-  //loop until gameCounter exceeds value
-  if (gameCounter < 100) {
+  //loop until gameCounter exceeds numberOfGames
+  if(gameCounter < numberOfGames){
     resetGameValues();
     game();
   }else{
-    console.log('x', xWins);
-    console.log('o', oWins);
-    console.log('tie', tie);
-    console.log('games', gameCounter);
+    getResults();
   }
 }
 
-// =====================LOOP GAME========================
+// ===================== DATABASE ========================
 
+function postBoard (board, turnCounter) {
+  $.post('/random/board', {
+    board : board,
+    gameID : gameCounter,
+    boardID : turnCounter,
+    winner : winner
+  })
+    .done(function () {
+      game();
+    });
+}
 
-
-
-
-
-
-
-
+function getResults () {
+  $.get('/results', function (response) {
+    console.log(response);
+  });
+  console.log('x', xWins);
+  console.log('o', oWins);
+  console.log('tie', tie);
+  console.log('games', gameCounter);
+}
 
 
 
