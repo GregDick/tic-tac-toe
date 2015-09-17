@@ -18,25 +18,25 @@ function game () {
   if(winner !== null){
     // userGameOver(winner);
     gameCounter++;
-    logResults(winner, gameCounter);
+    logResults();
   }else{
     turnCounter++;
     //based on turn
     //allow for user to click
     //or make a call to opponent API
     if(turn === 'X'){
-      randomTurn(board, turnCounter);
+      randomTurn();
       // userTurn();
     }else{
-      randomTurn(board, turnCounter);
+      randomTurn();
     }
   }
 };
 
-function checkForWin (board) {
+function checkForWin () {
   //there are 8 winning patterns
   //checkForThree with each pattern
-  var isItOver = checkForThree(board, 0, 1, 2) || checkForThree(board, 3, 4, 5) || checkForThree(board, 6, 7, 8) || checkForThree(board, 0, 3, 6) || checkForThree(board, 1, 4, 7) || checkForThree(board, 2, 5, 8)|| checkForThree(board, 0, 4, 8) || checkForThree(board, 2, 4, 6);
+  var isItOver = checkForThree(0, 1, 2) || checkForThree(3, 4, 5) || checkForThree(6, 7, 8) || checkForThree(0, 3, 6) || checkForThree(1, 4, 7) || checkForThree(2, 5, 8)|| checkForThree(0, 4, 8) || checkForThree(2, 4, 6);
   //check for draw where winner is 0
   if(!isItOver && board.indexOf(0) === -1){
     isItOver = {
@@ -46,7 +46,7 @@ function checkForWin (board) {
   return isItOver;
 };
 
-function checkForThree (board, x, y, z) {
+function checkForThree (x, y, z) {
   //if three in a row
   //return who wins and the winning play
   //else return null
@@ -94,7 +94,7 @@ function userTurn () {
   });
 }
 
-function randomTurn (board, turnCounter) {
+function randomTurn () {
   $squares.off(); // remove click handler from squares during opponent turn
   $.get('/random', {board : board})
     .done(function(res){
@@ -104,16 +104,16 @@ function randomTurn (board, turnCounter) {
       turn = turn === 'X' ? 'O' : 'X';
       //read board, check for winner and send game state to DB
       board = readBoard();
-      winner = checkForWin(board);
+      winner = checkForWin();
       //calls game() when it is finished writing data
-      postBoard(board, turnCounter);
+      postBoard();
     });
 }
 
 
 // ===================== AFTER GAME ========================
 
-function userGameOver (winner) {
+function userGameOver () {
   //remove click handler from all squares
   $squares.off();
   //if there is a winner, show winner and how they won
@@ -150,7 +150,7 @@ $('.winner').on('click', 'button', function () {
 
 // ===================== LOOP GAME========================
 
-function logResults (winner, gameCounter) {
+function logResults () {
   //increment the winner
   if(winner.who === 1){
     xWins++;
@@ -170,7 +170,7 @@ function logResults (winner, gameCounter) {
 
 // ===================== DATABASE ========================
 
-function postBoard (board, turnCounter) {
+function postBoard () {
   //posts game state to /random/board
   //calls game() when SQL finishes writing data
   $.post('/random/board', {
