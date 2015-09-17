@@ -37,7 +37,7 @@ function checkForWin (board) {
   //there are 8 winning patterns
   //checkForThree with each pattern
   var isItOver = checkForThree(board, 0, 1, 2) || checkForThree(board, 3, 4, 5) || checkForThree(board, 6, 7, 8) || checkForThree(board, 0, 3, 6) || checkForThree(board, 1, 4, 7) || checkForThree(board, 2, 5, 8)|| checkForThree(board, 0, 4, 8) || checkForThree(board, 2, 4, 6);
-  //check for draw
+  //check for draw where winner is 0
   if(!isItOver && board.indexOf(0) === -1){
     isItOver = {
       who : 0
@@ -98,10 +98,14 @@ function randomTurn (board, turnCounter) {
   $squares.off(); // remove click handler from squares during opponent turn
   $.get('/random', {board : board})
     .done(function(res){
+      //make the move
       $($squares[res.move]).text(turn);
+      //switch turns
       turn = turn === 'X' ? 'O' : 'X';
+      //read board, check for winner and send game state to DB
       board = readBoard();
       winner = checkForWin(board);
+      //calls game() when it is finished writing data
       postBoard(board, turnCounter);
     });
 }
@@ -127,6 +131,7 @@ function userGameOver (winner) {
 }
 
 function resetGameValues () {
+  //clear all the board tiles
   $squares.each(function (i, square) {
     $(square).removeClass('win');
     $(square).empty();
@@ -166,6 +171,8 @@ function logResults (winner, gameCounter) {
 // ===================== DATABASE ========================
 
 function postBoard (board, turnCounter) {
+  //posts game state to /random/board
+  //calls game() when SQL finishes writing data
   $.post('/random/board', {
     board : board,
     gameID : gameCounter,
@@ -178,6 +185,7 @@ function postBoard (board, turnCounter) {
 }
 
 function getResults () {
+  //calls /results for a SQL query to get all the data from the past loop
   $.get('/results', function (response) {
     console.log(response);
   });

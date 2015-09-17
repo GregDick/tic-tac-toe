@@ -1,6 +1,5 @@
 var path = require('path');
 var client = require(path.join(process.cwd(), '/www/lib/postgres'));
-var async = require('async');
 
 //==========================CONTROLLER EXPORTS=========================
 
@@ -35,9 +34,9 @@ module.exports.save = function (req, res) {
   var gameID  = req.body.gameID;
   var winner  = req.body.winner;
   //insert data
-  logGameState(board, boardID, gameID, winner, function (response){
-    res.send({response : response});
-  });
+  logGameState(board, boardID, gameID, winner);
+  //send a quick empty response
+  res.end();
 }
 
 module.exports.results = function (req, res) {
@@ -73,23 +72,23 @@ function createTable () {
   });
 };
 
-function logGameState (board, boardID, gameID, winner, cb) {
+function logGameState (board, boardID, gameID, winner) {
   var columns = "";
-  var unique = '"_' + gameID + '-' + boardID + '"';
   board.forEach(function (space, i) {
     columns += `, _${i}`;
   });
+  //if winner is undefined, set to null
   winner = winner ? winner.who : null;
+  //creates unique primary key based on gameID and board ID
+  var unique = '"_' + gameID + '-' + boardID + '"';
+  //concatenates all the values into an array for the parameterized query
   var values = [unique, gameID, winner].concat(board);
 
   var queryString = `INSERT INTO "Random"("boardID", "gameID", "winner"${columns}) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);`;
 
-  client.query(queryString, values, function(err, response){
-    // console.log(queryString);
+  client.query(queryString, values, function(err){
     if(err){
       console.log(err);
-    }else{
-      cb(response);
     }
   });
 };
