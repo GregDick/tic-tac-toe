@@ -41,7 +41,8 @@ module.exports.save = function (req, res) {
 
 module.exports.results = function (req, res) {
   // view the results of gameplay
-  client.query(`SELECT * FROM "Random"`, function(err, result){
+  var queryString = `SELECT * FROM "Random" WHERE "winner" = $1`;
+  client.query(queryString, [1], function(err, result){
     if(err){
       console.log(err);
     }

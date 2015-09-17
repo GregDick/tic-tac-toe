@@ -3,8 +3,9 @@
 }
 
 .square {
+  display : inline-block;
   height : 150px;
-  width : 150px;
+  width : 150px !important;
   border : solid #333;
   padding : 0;
   font-size : 7em;
@@ -60,11 +61,15 @@
   font-size : 7.5em;
 }
 
+.winner {
+  margin-top : 20px;
+}
+
 #playAgain {
   height : 75%;
   width : 35%;
   font-size : 2em;
-  margin-left : 10%;
+  margin : 0 0 10px 10%;
   padding-top : 0;
 }
 

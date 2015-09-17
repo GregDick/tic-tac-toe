@@ -16,17 +16,17 @@ var $playAgain    = $('#playAgain');
 function game () {
   board = readBoard();
   if(winner !== null){
-    // userGameOver(winner);
+    userGameOver(winner);
     gameCounter++;
-    logResults();
+    // logResults();
   }else{
     turnCounter++;
     //based on turn
     //allow for user to click
     //or make a call to opponent API
     if(turn === 'X'){
-      randomTurn();
-      // userTurn();
+      // randomTurn();
+      userTurn();
     }else{
       randomTurn();
     }
