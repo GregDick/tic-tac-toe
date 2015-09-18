@@ -41,12 +41,11 @@ module.exports.save = function (req, res) {
 
 module.exports.results = function (req, res) {
   // view the results of gameplay
-  var queryString = `SELECT * FROM "Random" WHERE "winner" = $1`;
-  client.query(queryString, [1], function(err, result){
-    if(err){
-      console.log(err);
-    }
-    res.send({data : result.rows});
+  getWinningPercent(function (result) {
+    result.xPercent = 100 * result.xWins / result.total;
+    result.oPercent = 100 * result.oWins / result.total;
+    result.tiePercent = 100 * result.ties / result.total;
+    res.send(result);
   });
 }
 
@@ -93,6 +92,31 @@ function logGameState (board, boardID, gameID, winner) {
     }
   });
 };
+
+function getWinningPercent (cb) {
+  var selectString = `SELECT (SELECT COUNT("winner") FROM "Random" WHERE "winner"=$1) AS "xWins",
+    (SELECT COUNT("winner") FROM "Random" WHERE "winner"=$2) AS "oWins",
+    (SELECT COUNT("winner") FROM "Random" WHERE "winner"=$3) AS "ties",
+    (SELECT COUNT("winner") FROM "Random" WHERE "winner" IS NOT NULL) AS "total"`;
+  client.query(selectString, [1, -1, 0], function (err, result) {
+    if(err){
+      console.log(err);
+    }else{
+      cb(result.rows[0]);
+    }
+  });
+}
+
+function getAll () {
+  var queryString = `SELECT * FROM "Random" WHERE "winner" = $1`;
+  client.query(queryString, [1], function(err, result){
+    if(err){
+      console.log(err);
+    }
+    console.log(result.rows);
+  });
+}
+
 
 
 //==========================PLAYER FUNCTIONS=========================

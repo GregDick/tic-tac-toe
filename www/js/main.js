@@ -4,7 +4,7 @@ var board;
 var xWins  = 0;
 var oWins  = 0;
 var tie    = 0;
-var numberOfGames = 10;
+var numberOfGames = 20;
 var gameCounter   = 0;
 var turnCounter   = 0;
 //jQuery selectors
@@ -188,18 +188,38 @@ function getResults () {
   //calls /results for a SQL query to get all the data from the past loop
   $.get('/results', function (response) {
     console.log(response);
+    $('.winner').append('<h1>Winning Percentage</h1>');
+    createChart(response);
   });
   console.log('x', xWins);
   console.log('o', oWins);
   console.log('tie', tie);
   console.log('games', gameCounter);
-  $('.winner').append('<h1> Games : ' + gameCounter + '</h1>');
-  $('.winner').append('<h1> X : ' + xWins + '</h1>');
-  $('.winner').append('<h1> O : ' + oWins + '</h1>');
-  $('.winner').append('<h1> Ties : ' + tie + '</h1>');
+  // $('.winner').append('<h1> X : ' + xWins + '</h1>');
+  // $('.winner').append('<h1> O : ' + oWins + '</h1>');
+  // $('.winner').append('<h1> Ties : ' + tie + '</h1>');
 }
 
+function createChart (response) {
+  // Get context with jQuery - using jQuery's .get() method.
+  var ctx = $("#results").get(0).getContext("2d");
 
+  data = [{
+    value : response.xPercent,
+    color : 'red',
+    label : 'X Wins'
+  },{
+    value : response.oPercent,
+    color : 'blue',
+    label : 'O Wins'
+  },{
+    value : response.tiePercent,
+    color : 'yellow',
+    label : 'Ties'
+  }];
+
+  new Chart(ctx).Doughnut(data);
+}
 
 
 
