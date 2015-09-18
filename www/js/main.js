@@ -16,17 +16,17 @@ var $playAgain    = $('#playAgain');
 function game () {
   board = readBoard();
   if(winner !== null){
-    userGameOver(winner);
+    // userGameOver(winner);
     gameCounter++;
-    // logResults();
+    logResults();
   }else{
     turnCounter++;
     //based on turn
     //allow for user to click
     //or make a call to opponent API
     if(turn === 'X'){
-      // randomTurn();
-      userTurn();
+      randomTurn();
+      // userTurn();
     }else{
       randomTurn();
     }
@@ -193,6 +193,10 @@ function getResults () {
   console.log('o', oWins);
   console.log('tie', tie);
   console.log('games', gameCounter);
+  $('.winner').append('<h1> Games : ' + gameCounter + '</h1>');
+  $('.winner').append('<h1> X : ' + xWins + '</h1>');
+  $('.winner').append('<h1> O : ' + oWins + '</h1>');
+  $('.winner').append('<h1> Ties : ' + tie + '</h1>');
 }
 
 

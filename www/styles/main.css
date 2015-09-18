@@ -2,6 +2,10 @@
   padding : 5%;
 }
 
+#tableBoard {
+  max-width : 500px;
+}
+
 .square {
   display : inline-block;
   height : 150px;

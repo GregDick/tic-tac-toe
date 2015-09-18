@@ -10,19 +10,20 @@ html
   body
     .container
       .row
-        table.table.table-responsive
-          tr
-            td#zero.square
-            td#one.square
-            td#two.square
-          tr
-            td#three.square
-            td#four.square
-            td#five.square
-          tr
-            td#six.square
-            td#seven.square
-            td#eight.square
+        .col-lg-6
+          table#tableBoard.table.table-responsive
+            tr
+              td#zero.square
+              td#one.square
+              td#two.square
+            tr
+              td#three.square
+              td#four.square
+              td#five.square
+            tr
+              td#six.square
+              td#seven.square
+              td#eight.square
         .col-lg-6.winner
 
     include partials/footer
