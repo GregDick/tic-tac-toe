@@ -1,9 +1,6 @@
 var winner = null;
 var turn   = 'X';
 var board;
-var xWins  = 0;
-var oWins  = 0;
-var tie    = 0;
 var numberOfGames = 20;
 var gameCounter   = 0;
 var turnCounter   = 0;
@@ -18,7 +15,7 @@ function game () {
   if(winner !== null){
     // userGameOver(winner);
     gameCounter++;
-    logResults();
+    loopGame();
   }else{
     turnCounter++;
     //based on turn
@@ -150,15 +147,7 @@ $('.winner').on('click', 'button', function () {
 
 // ===================== LOOP GAME========================
 
-function logResults () {
-  //increment the winner
-  if(winner.who === 1){
-    xWins++;
-  }else if(winner.who === -1){
-    oWins++;
-  }else{
-    tie++;
-  };
+function loopGame () {
   //loop until gameCounter exceeds numberOfGames
   if(gameCounter < numberOfGames){
     resetGameValues();
@@ -188,16 +177,9 @@ function getResults () {
   //calls /results for a SQL query to get all the data from the past loop
   $.get('/results', function (response) {
     console.log(response);
-    $('.winner').append('<h1>Winning Percentage</h1>');
+    $('.winner').append('<h1>Winning Percentage of '+ response.total +' Games</h1>');
     createChart(response);
   });
-  console.log('x', xWins);
-  console.log('o', oWins);
-  console.log('tie', tie);
-  console.log('games', gameCounter);
-  // $('.winner').append('<h1> X : ' + xWins + '</h1>');
-  // $('.winner').append('<h1> O : ' + oWins + '</h1>');
-  // $('.winner').append('<h1> Ties : ' + tie + '</h1>');
 }
 
 function createChart (response) {
