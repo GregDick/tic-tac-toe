@@ -22,7 +22,8 @@ function game () {
     //allow for user to click
     //or make a call to opponent API
     if(turn === 'X'){
-      randomTurn();
+      expertTurn();
+      // randomTurn();
       // userTurn();
     }else{
       randomTurn();
@@ -107,6 +108,13 @@ function randomTurn () {
     });
 }
 
+function expertTurn () {
+  $.get('/expert', {board : [-1, 0, 1, 1, 0, 0, 1, -1, -1], turn : turn})
+    .done(function (res) {
+      console.log(res);
+    });
+}
+
 
 // ===================== AFTER GAME ========================
 
@@ -175,7 +183,7 @@ function postBoard () {
 
 function getResults () {
   //calls /results for a SQL query to get all the data from the past loop
-  $.get('/results', function (response) {
+  $.get('/random/results', function (response) {
     console.log(response);
     $('.winner').append('<h1>Winning Percentage of '+ response.total +' Games</h1>');
     createChart(response);
