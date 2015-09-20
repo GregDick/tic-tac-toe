@@ -9,30 +9,28 @@ module.exports.move = function (req, res) {
 
   var moves = getPossibleMoves(originalBoard);
   console.log(moves);
-  getPossibleBoards(originalBoard, turn, moves);
-  // miniMax(originalBoard, turn, null);
-  // res.send({move : move});
+
+  miniMax(originalBoard, turn, 0);
+  // res.send({move : move}) ;
 }
 
 
 //=========================== GAME FUNCTIONS =========================
-var scores = {};
-
-function miniMax (board, turn, move) {
+function miniMax (board, turn, depth) {
   var winner = checkForWin(board);
   if(winner !== null){
-    var score = winner.who * 10;
-    if (scores[move]) {
-      scores[move] += score;
-    }else{
-      scores[move] = score;
-    }
-    console.log('scores', scores);
+    var score = winner;
+    // console.log(score);
     return score;
   }else {
-    turn = turn === '1' ? '-1' : '1';
+    //make new moves and scores list based on depth
     var possibleMoves = getPossibleMoves(board);
-    getPossibleBoards(board, turn, possibleMoves);
+    //create a scores list for the possible moves
+    var scoresList = [];
+    possibleMoves.forEach(function () {
+      scoresList.push(null);
+    });
+    getPossibleBoards(board, turn, possibleMoves, scoresList, depth);
   }
 }
 
@@ -41,29 +39,30 @@ function checkForWin (board) {
   //there are 8 winning patterns
   //checkForThree with each pattern
   var isItOver = checkForThree(board, 0, 1, 2) || checkForThree(board, 3, 4, 5) || checkForThree(board, 6, 7, 8) || checkForThree(board, 0, 3, 6) || checkForThree(board, 1, 4, 7) || checkForThree(board, 2, 5, 8)|| checkForThree(board, 0, 4, 8) || checkForThree(board, 2, 4, 6);
-  //check for draw where winner is 0
+  //check for draw and return 0
   if(!isItOver && board.indexOf('0') === -1){
-    isItOver = {
-      who : '0'
-    };
+    isItOver = 0;
   }
   return isItOver;
 };
 
 function checkForThree (board, x, y, z) {
   //if three in a row
-  //return who wins and the winning play
+  //return the score relative to player X
   //else return null
   if(board[x] !== '0' && board[x] === board[y] && board[y] === board[z]){
-    return {
-      who : board[x]
-    };
+    if(board[x] === '1'){
+      return 10;
+    }else{
+      return -10;
+    }
   }else{
     return null;
   }
 }
 
 function getPossibleMoves (board) {
+  //return an array of all the available moves for a board
   var arr = [];
   board.forEach(function (space, i) {
     if(space === '0'){
@@ -73,16 +72,19 @@ function getPossibleMoves (board) {
   return arr;
 }
 
-function getPossibleBoards (board, turn, possibleMoves) {
+function getPossibleBoards (board, turn, possibleMoves, scoresList, depth) {
   //extrapolate all possible game states from a given board
   possibleMoves.forEach(function (newMove, i) {
     var newBoard = board.slice(0);
     //create a new board with each move
     newBoard[newMove] = turn;
-    //call minimax on all new boards
-
-    miniMax(newBoard, turn, newMove);
+    //recurse miniMax until it returns a score
+    //put that score in the scores list at the same index as its move
+    turn = turn === '1' ? '-1' : '1';
+    scoresList[i] = miniMax(newBoard, turn, depth++);
   });
+  console.log(scoresList);
+  return scoresList;
 }
 
 
