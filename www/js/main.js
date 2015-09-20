@@ -1,7 +1,7 @@
 var winner = null;
 var turn   = 'X';
 var board;
-var numberOfGames = 20;
+var numberOfGames = 1;
 var gameCounter   = 0;
 var turnCounter   = 0;
 //jQuery selectors
@@ -26,7 +26,8 @@ function game () {
       // randomTurn();
       // userTurn();
     }else{
-      randomTurn();
+      // randomTurn();
+      expertTurn();
     }
   }
 };
@@ -109,9 +110,17 @@ function randomTurn () {
 }
 
 function expertTurn () {
-  $.get('/expert', {board : [-1, 0, 1, 1, 0, 0, 1, -1, -1], turn : turn})
+  $.get('/expert', {board : board, turn : turn})
     .done(function (res) {
-      console.log(res);
+      //make the move
+      $($squares[res.move]).text(turn);
+      //switch turns
+      turn = turn === 'X' ? 'O' : 'X';
+      //read board, check for winner and send game state to DB
+      board = readBoard();
+      winner = checkForWin();
+      //calls game() when it is finished writing data
+      postBoard();
     });
 }
 

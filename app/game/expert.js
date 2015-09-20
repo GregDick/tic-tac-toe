@@ -1,42 +1,43 @@
 var path = require('path');
+var _ = require('lodash');
 var client = require(path.join(process.cwd(), '/www/lib/postgres'));
 
 
 module.exports.move = function (req, res) {
   var originalBoard = req.query.board;
-  console.log(originalBoard);
+  console.log(req.query.turn);
   var turn = req.query.turn === 'X' ? '1' : '-1';
 
   var finalMoves = getPossibleMoves(originalBoard);
-  console.log(finalMoves);
-
-  var finalScores = miniMax(originalBoard, turn, 0);
+  var scores = miniMax(originalBoard, turn, 0);
+  var finalScores = flattenAndSum(scores);
   console.log('finalScores', finalScores);
-  // res.send({move : move}) ;
+  var move = pickMove(finalScores, finalMoves, req.query.turn);
+  res.send({move : move});
 }
 
 
 //=========================== GAME FUNCTIONS =========================
 function miniMax (board, turn, depth) {
-  console.log('depth', depth);
   turn = turn === '1' ? '-1' : '1';
   var winner = checkForWin(board);
   if(winner !== null){
     var score = winner * turn;
     return score;
   }
-  //make new moves and scores list based on depth
+  //make new possibleMoves and scoresList for each level of depth
   var possibleMoves = getPossibleMoves(board);
   //create a scores list for the possible moves
   var newBoard;
   var scoresList = possibleMoves.map(function (move, i) {
     //for each move, get the new board, switch the turn and call minimax
-    //save the miniMax score to the scoresList at this move's index
+    //return the miniMax score to the scoresList at this move's index
     newBoard = getPossibleBoard(board, turn, move);
     turn = turn === '1' ? '-1' : '1';
     var thisScore = miniMax(newBoard, turn, depth++);
     return thisScore;
   });
+  //if no score is returned, return the score list to group nested scores
   return scoresList;
 }
 
@@ -74,12 +75,35 @@ function getPossibleMoves (board) {
 }
 
 function getPossibleBoard (board, turn, move) {
+  //return a single board with a new move implemented
   var newBoard = board.slice(0);
   newBoard[move] = turn;
   return newBoard;
 }
 
+function flattenAndSum (scores) {
+  //accepts an array of nested scores and returns an array with single scores for each index
+  return scores.map(function (score) {
+    if(typeof score === 'object'){
+      _.flatten(score, true);
+      return _.sum(score);
+    }else{
+      return score;
+    }
+  });
+}
 
+function pickMove (finalScores, finalMoves, turn) {
+  if(turn === 'X'){
+    var maxScore = _.max(finalScores);
+    var index = finalScores.indexOf(maxScore);
+  }else{
+    var minScore = _.min(finalScores);
+    var index = finalScores.indexOf(minScore);
+  }
+  console.log(index);
+  return finalMoves[index];
+}
 
 
 
