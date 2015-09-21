@@ -5,15 +5,16 @@ var client = require(path.join(process.cwd(), '/www/lib/postgres'));
 
 module.exports.move = function (req, res) {
   var originalBoard = req.query.board;
-  console.log(req.query.turn);
   var turn = req.query.turn === 'X' ? '1' : '-1';
 
   var finalMoves = getPossibleMoves(originalBoard);
-  var scores = miniMax(originalBoard, turn, 0);
-  var finalScores = flattenAndSum(scores);
+  var scores = miniMax(originalBoard, turn, 1);
+  console.log('scores', scores);
+  console.log('turn', turn);
+  var finalScores = pickAndFlatten(scores, turn);
   console.log('finalScores', finalScores);
-  var move = pickMove(finalScores, finalMoves, req.query.turn);
-  res.send({move : move});
+  // var move = pickMove(finalScores, finalMoves, req.query.turn);
+  // res.send({move : move});
 }
 
 
@@ -35,9 +36,11 @@ function miniMax (board, turn, depth) {
     newBoard = getPossibleBoard(board, turn, move);
     turn = turn === '1' ? '-1' : '1';
     var thisScore = miniMax(newBoard, turn, depth++);
+
     return thisScore;
   });
-  //if no score is returned, return the score list to group nested scores
+  //if no score is returned, return the scoresList;
+  // console.log('scoresList', scoresList);
   return scoresList;
 }
 
@@ -57,7 +60,7 @@ function checkForThree (board, x, y, z) {
   //return the score relative to player X
   //else return null
   if(board[x] !== '0' && board[x] === board[y] && board[y] === board[z]){
-    return 10;
+    return 100;
   }else{
     return null;
   }
@@ -81,17 +84,6 @@ function getPossibleBoard (board, turn, move) {
   return newBoard;
 }
 
-function flattenAndSum (scores) {
-  //accepts an array of nested scores and returns an array with single scores for each index
-  return scores.map(function (score) {
-    if(typeof score === 'object'){
-      _.flatten(score, true);
-      return _.sum(score);
-    }else{
-      return score;
-    }
-  });
-}
 
 function pickMove (finalScores, finalMoves, turn) {
   if(turn === 'X'){
@@ -101,9 +93,63 @@ function pickMove (finalScores, finalMoves, turn) {
     var minScore = _.min(finalScores);
     var index = finalScores.indexOf(minScore);
   }
-  console.log(index);
   return finalMoves[index];
 }
+
+function pickAndFlatten (scores, turn) {
+  return scores.map(function (element) {
+    //for each element, loop pickHelper until element is a number
+    while(typeof element !== 'number'){
+      turn = turn === '1' ? '-1' : '1';
+      element = pickHelper(element, turn);
+    }
+    return element;
+  });
+}
+
+function pickHelper (data, turn) {
+  // returns single number from an array
+
+  //find the first array where all child elements are numbers,
+  // return min or max of that array depending on turn
+  //bring this number up one level in the array tree and repeat
+
+  //if data is an array, get to the most nested element
+  if(typeof data !== 'number'){
+    //if all elements of data are numbers
+    if(checkForNumbers(data)){
+      //return min or max depending on turn
+      if(turn==='1'){
+        return _.max(data);
+      }else{
+        return _.min(data);
+      }
+    }else{
+      //call pickHelper one level deeper and return resulting array to the while loop
+      return data.map(function (element) {
+        //alternate turn when going one level deeper
+        turn = turn === '1' ? '-1' : '1';
+        return pickHelper(element, turn);
+      });
+    }
+  }else{
+    //if data is just a number, return it
+    return data;
+  }
+}
+
+function checkForNumbers (arr) {
+//checks if all elements of an array are numbers. returns boolean true if they are all numbers
+  var passing = true;
+  arr.forEach(function (element) {
+    if(typeof element !== 'number'){
+      passing = false;
+    }
+  });
+  return passing;
+}
+
+
 
 
 
