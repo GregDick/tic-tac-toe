@@ -74,7 +74,7 @@ function readBoard () {
 }
 
 //play ball
-game();
+// game();
 
 
 // ===================== PLAYERS ========================
