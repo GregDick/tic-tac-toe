@@ -1,7 +1,7 @@
 var winner = null;
 var turn   = 'X';
 var board;
-var numberOfGames = 1;
+var numberOfGames = 10;
 var gameCounter   = 0;
 var turnCounter   = 0;
 //jQuery selectors
@@ -26,8 +26,8 @@ function game () {
       // randomTurn();
       // userTurn();
     }else{
-      randomTurn();
-      // expertTurn();
+      // randomTurn();
+      expertTurn();
     }
   }
 };
@@ -110,7 +110,7 @@ function randomTurn () {
 }
 
 function expertTurn () {
-  $.get('/expert', {board : [-1, 0, 1, 1, 0, 0, 1, -1, -1], turn : turn})
+  $.get('/expert', {board : board, turn : turn})
     .done(function (res) {
       //make the move
       $($squares[res.move]).text(turn);

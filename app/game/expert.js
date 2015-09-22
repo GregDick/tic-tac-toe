@@ -4,17 +4,15 @@ var client = require(path.join(process.cwd(), '/www/lib/postgres'));
 
 
 module.exports.move = function (req, res) {
-  var originalBoard = req.query.board;
-  var turn = req.query.turn === 'X' ? '1' : '-1';
+  var board = req.query.board;
 
-  var finalMoves = getPossibleMoves(originalBoard);
-  var scores = miniMax(originalBoard, turn, 1);
-  console.log('scores', scores);
-  console.log('turn', turn);
-  var finalScores = pickAndFlatten(scores, turn);
-  console.log('finalScores', finalScores);
-  // var move = pickMove(finalScores, finalMoves, req.query.turn);
-  // res.send({move : move});
+  var finalMoves = getPossibleMoves(board);
+  console.log(finalMoves);
+
+  var choice = bestMoveAndScore(board);
+  console.log(choice);
+
+  res.send({move : choice.move});
 }
 
 
@@ -23,7 +21,8 @@ function miniMax (board, turn, depth) {
   turn = turn === '1' ? '-1' : '1';
   var winner = checkForWin(board);
   if(winner !== null){
-    var score = winner * turn;
+    var score = winner;
+    console.log('score', score);
     return score;
   }
   //make new possibleMoves and scoresList for each level of depth
@@ -44,6 +43,44 @@ function miniMax (board, turn, depth) {
   return scoresList;
 }
 
+// ====================== LET'S TRY SOMETHING DIFFERENT =================
+
+function bestMoveAndScore (board) {
+  var best = {
+    move : null,
+    score : -Infinity
+  }
+  var moves = getPossibleMoves(board);
+  //get the best move and score by trying each move
+  moves.forEach(function (move) {
+    var score = scoreMove(board, move);
+    if(score > best.score){
+      best.score = score;
+      best.move = move;
+    }
+  });
+
+  return best;
+}
+
+
+function scoreMove (board, move) {
+  var after = getPossibleBoard(board, move);
+  //see if after is a winning board, return if it is
+  var winningScore = checkForWin(after);
+  if(winningScore !== null){
+    return winningScore;
+  }
+  //find the opponent's best counter move and score
+  var counter = bestMoveAndScore(after);
+  return -counter.score;
+}
+
+
+
+
+// ====================== LET'S TRY SOMETHING DIFFERENT =================
+
 function checkForWin (board) {
   //there are 8 winning patterns
   //checkForThree with each pattern
@@ -57,13 +94,24 @@ function checkForWin (board) {
 
 function checkForThree (board, x, y, z) {
   //if three in a row
-  //return the score relative to player X
+  //return the score relative to who just went
   //else return null
   if(board[x] !== '0' && board[x] === board[y] && board[y] === board[z]){
-    return 100;
+    return whoJustWent(board) === board[x] ? 100 : -100;
   }else{
     return null;
   }
+}
+
+function whoJustWent (board) {
+  //will not be called on a totally empty board
+  //if empty spaces is even, O just went
+  //if odd, X just went
+  var emptyCount = 0;
+  board.forEach(function (square) {
+    emptyCount = square === '0' ? emptyCount + 1 : emptyCount;
+  });
+  return emptyCount % 2 ? '-1' : '1';
 }
 
 function getPossibleMoves (board) {
@@ -77,9 +125,10 @@ function getPossibleMoves (board) {
   return arr;
 }
 
-function getPossibleBoard (board, turn, move) {
-  //return a single board with a new move implemented
+function getPossibleBoard (board, move) {
+  //return a single board with the new move implemented
   var newBoard = board.slice(0);
+  var turn = whoJustWent(board) === '1' ? '-1' : '1';
   newBoard[move] = turn;
   return newBoard;
 }
