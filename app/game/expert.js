@@ -2,57 +2,25 @@ var path = require('path');
 var _ = require('lodash');
 var client = require(path.join(process.cwd(), '/www/lib/postgres'));
 
-
 module.exports.move = function (req, res) {
   var board = req.query.board;
-
-  var finalMoves = getPossibleMoves(board);
-  console.log(finalMoves);
-
   var choice = bestMoveAndScore(board);
-  console.log(choice);
 
   res.send({move : choice.move});
 }
 
-
-//=========================== GAME FUNCTIONS =========================
-function miniMax (board, turn, depth) {
-  turn = turn === '1' ? '-1' : '1';
-  var winner = checkForWin(board);
-  if(winner !== null){
-    var score = winner;
-    console.log('score', score);
-    return score;
-  }
-  //make new possibleMoves and scoresList for each level of depth
-  var possibleMoves = getPossibleMoves(board);
-  //create a scores list for the possible moves
-  var newBoard;
-  var scoresList = possibleMoves.map(function (move, i) {
-    //for each move, get the new board, switch the turn and call minimax
-    //return the miniMax score to the scoresList at this move's index
-    newBoard = getPossibleBoard(board, turn, move);
-    turn = turn === '1' ? '-1' : '1';
-    var thisScore = miniMax(newBoard, turn, depth++);
-
-    return thisScore;
-  });
-  //if no score is returned, return the scoresList;
-  // console.log('scoresList', scoresList);
-  return scoresList;
-}
-
-// ====================== LET'S TRY SOMETHING DIFFERENT =================
+//===================================== MINIMAX ALGORITHM =======================================
 
 function bestMoveAndScore (board) {
+  //gets the best move and score by trying each move
+  // and predicting the opponent's best move until the game is over
   var best = {
     move : null,
     score : -Infinity
   }
   var moves = getPossibleMoves(board);
-  //get the best move and score by trying each move
   moves.forEach(function (move) {
+    //try each move and set the max score as best
     var score = scoreMove(board, move);
     if(score > best.score){
       best.score = score;
@@ -63,23 +31,20 @@ function bestMoveAndScore (board) {
   return best;
 }
 
-
 function scoreMove (board, move) {
+  //returns the score of a move
   var after = getPossibleBoard(board, move);
   //see if after is a winning board, return if it is
   var winningScore = checkForWin(after);
   if(winningScore !== null){
     return winningScore;
   }
-  //find the opponent's best counter move and score
+  //if move is not a winning move, recurse and predict moves until the game is over and a score is returned
   var counter = bestMoveAndScore(after);
   return -counter.score;
 }
 
-
-
-
-// ====================== LET'S TRY SOMETHING DIFFERENT =================
+//===================================== HELPER FUNCTIONS =======================================
 
 function checkForWin (board) {
   //there are 8 winning patterns
@@ -132,74 +97,6 @@ function getPossibleBoard (board, move) {
   newBoard[move] = turn;
   return newBoard;
 }
-
-
-function pickMove (finalScores, finalMoves, turn) {
-  if(turn === 'X'){
-    var maxScore = _.max(finalScores);
-    var index = finalScores.indexOf(maxScore);
-  }else{
-    var minScore = _.min(finalScores);
-    var index = finalScores.indexOf(minScore);
-  }
-  return finalMoves[index];
-}
-
-function pickAndFlatten (scores, turn) {
-  return scores.map(function (element) {
-    //for each element, loop pickHelper until element is a number
-    while(typeof element !== 'number'){
-      turn = turn === '1' ? '-1' : '1';
-      element = pickHelper(element, turn);
-    }
-    return element;
-  });
-}
-
-function pickHelper (data, turn) {
-  // returns single number from an array
-
-  //find the first array where all child elements are numbers,
-  // return min or max of that array depending on turn
-  //bring this number up one level in the array tree and repeat
-
-  //if data is an array, get to the most nested element
-  if(typeof data !== 'number'){
-    //if all elements of data are numbers
-    if(checkForNumbers(data)){
-      //return min or max depending on turn
-      if(turn==='1'){
-        return _.max(data);
-      }else{
-        return _.min(data);
-      }
-    }else{
-      //call pickHelper one level deeper and return resulting array to the while loop
-      return data.map(function (element) {
-        //alternate turn when going one level deeper
-        turn = turn === '1' ? '-1' : '1';
-        return pickHelper(element, turn);
-      });
-    }
-  }else{
-    //if data is just a number, return it
-    return data;
-  }
-}
-
-function checkForNumbers (arr) {
-//checks if all elements of an array are numbers. returns boolean true if they are all numbers
-  var passing = true;
-  arr.forEach(function (element) {
-    if(typeof element !== 'number'){
-      passing = false;
-    }
-  });
-  return passing;
-}
-
-
-
 
 
 

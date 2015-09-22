@@ -110,7 +110,7 @@ function randomTurn () {
 }
 
 function expertTurn () {
-  $.get('/expert', {board : board, turn : turn})
+  $.get('/expert', {board : board})
     .done(function (res) {
       //make the move
       $($squares[res.move]).text(turn);
