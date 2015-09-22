@@ -5,14 +5,14 @@ var client = require(path.join(process.cwd(), '/www/lib/postgres'));
 module.exports.move = function (req, res) {
   var board = req.query.board;
   // var board = ['0', '1', '0', '0', '0', '1', '-1', '-1', '1'];
-  var choice = bestMoveAndScore(board);
-
+  var choice = bestMoveAndScore(board, 0);
+  console.log(choice);
   res.send({move : choice.move});
 }
 
 //===================================== MINIMAX ALGORITHM =======================================
 
-function bestMoveAndScore (board) {
+function bestMoveAndScore (board, depth) {
   //gets the best move and score by trying each move
   // and predicting the opponent's best move until the game is over
   var best = {
@@ -21,9 +21,10 @@ function bestMoveAndScore (board) {
   }
   var moves = getPossibleMoves(board);
   var equalMoves;
+  depth++;
   moves.forEach(function (move) {
     //try each move and get its score
-    var score = scoreMove(board, move);
+    var score = scoreMove(board, move, depth);
     //set the highest score as best.score and save the move
     if(score > best.score){
       best.score = score;
@@ -40,16 +41,16 @@ function bestMoveAndScore (board) {
   return best;
 }
 
-function scoreMove (board, move) {
+function scoreMove (board, move, depth) {
   //returns the score of a move
   var after = getPossibleBoard(board, move);
   //see if after is a winning board, return if it is
   var winningScore = checkForWin(after);
   if(winningScore !== null){
-    return winningScore;
+    return winningScore - depth;
   }
   //if move is not a winning move, recurse and predict moves until the game is over and a score is returned
-  var counter = bestMoveAndScore(after);
+  var counter = bestMoveAndScore(after, depth);
   return -counter.score;
 }
 
