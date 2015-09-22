@@ -4,6 +4,7 @@ var client = require(path.join(process.cwd(), '/www/lib/postgres'));
 
 module.exports.move = function (req, res) {
   var board = req.query.board;
+  // var board = ['0', '1', '0', '0', '0', '1', '-1', '-1', '1'];
   var choice = bestMoveAndScore(board);
 
   res.send({move : choice.move});
@@ -19,14 +20,22 @@ function bestMoveAndScore (board) {
     score : -Infinity
   }
   var moves = getPossibleMoves(board);
+  var equalMoves;
   moves.forEach(function (move) {
-    //try each move and set the max score as best
+    //try each move and get its score
     var score = scoreMove(board, move);
+    //set the highest score as best.score and save the move
     if(score > best.score){
       best.score = score;
-      best.move = move;
+      equalMoves = [move];
+    }else if(score === best.score){
+      //if scores are equal, push move to equalMoves to randomly pick one later
+      equalMoves.push(move);
     }
   });
+
+  //if there is more than one move in equal moves, randomly pick one
+  best.move = equalMoves.length > 1 ? randomlyPickMove(equalMoves) : equalMoves[0];
 
   return best;
 }
@@ -98,7 +107,12 @@ function getPossibleBoard (board, move) {
   return newBoard;
 }
 
-
+function randomlyPickMove (moves) {
+  // if more than one move is valued at the same score
+  //  chooses one at random for variety in gameplay
+  var guess = Math.floor(Math.random() * (moves.length));
+  return moves[guess];
+}
 
 
 

@@ -1,26 +1,24 @@
-var winner = null;
-var turn   = 'X';
-var board;
-var numberOfGames = 10;
-var gameCounter   = 0;
-var turnCounter   = 0;
 //jQuery selectors
 var $squares      = $('.square');
 var $playAgain    = $('#playAgain');
+//game variables
+var winner = null;
+var turn   = 'X';
+var board  = readBoard();
+var numberOfGames = 10;
+var gameCounter   = 0;
+var turnCounter   = 0;
 
 // ===================== GAME ========================
 
 function game () {
-  board = readBoard();
-  if(winner !== null){
+  if(winner){
     // userGameOver(winner);
     gameCounter++;
     loopGame();
   }else{
     turnCounter++;
-    //based on turn
-    //allow for user to click
-    //or make a call to opponent API
+    //based on turn, allow for user to click or make a call to opponent API
     if(turn === 'X'){
       expertTurn();
       // randomTurn();
@@ -28,13 +26,13 @@ function game () {
     }else{
       // randomTurn();
       expertTurn();
+      // userTurn();
     }
   }
 };
 
 function checkForWin () {
-  //there are 8 winning patterns
-  //checkForThree with each pattern
+  //there are 8 winning patterns. Call checkForThree with each pattern
   var isItOver = checkForThree(0, 1, 2) || checkForThree(3, 4, 5) || checkForThree(6, 7, 8) || checkForThree(0, 3, 6) || checkForThree(1, 4, 7) || checkForThree(2, 5, 8)|| checkForThree(0, 4, 8) || checkForThree(2, 4, 6);
   //check for draw where winner is 0
   if(!isItOver && board.indexOf(0) === -1){
@@ -60,9 +58,7 @@ function checkForThree (x, y, z) {
 }
 
 function readBoard () {
-  //iterate over board elements
-  //and push to map array
-  //for X = 1 empty = 0 and O = -1
+  //translate the HTML board to the javascript array board where X = 1 empty = 0 and O = -1
   var map = [];
   $.each($squares, function (i, square) {
     var text = $(square).text();
@@ -85,10 +81,12 @@ game();
 
 function userTurn () {
   $squares.click(turn, function () {
+    //if square has no text, it's an allowable move
     if(!$(this).text()){
       $(this).text(turn);
       turn = turn === 'X' ? 'O' : 'X';
-      game();
+      //calls game() when it is finished writing data
+      postBoard();
     }
   });
 }
@@ -101,24 +99,19 @@ function randomTurn () {
       $($squares[res.move]).text(turn);
       //switch turns
       turn = turn === 'X' ? 'O' : 'X';
-      //read board, check for winner and send game state to DB
-      board = readBoard();
-      winner = checkForWin();
       //calls game() when it is finished writing data
       postBoard();
     });
 }
 
 function expertTurn () {
+  $squares.off(); // remove click handler from squares during opponent turn
   $.get('/expert', {board : board})
     .done(function (res) {
       //make the move
       $($squares[res.move]).text(turn);
       //switch turns
       turn = turn === 'X' ? 'O' : 'X';
-      //read board, check for winner and send game state to DB
-      board = readBoard();
-      winner = checkForWin();
       //calls game() when it is finished writing data
       postBoard();
     });
@@ -153,6 +146,7 @@ function resetGameValues () {
   turnCounter = 0;
   winner = null;
   turn = 'X';
+  board = readBoard();
 }
 
 //playAgain click handler
@@ -177,8 +171,9 @@ function loopGame () {
 // ===================== DATABASE ========================
 
 function postBoard () {
-  //posts game state to /random/board
-  //calls game() when SQL finishes writing data
+  //reads board, checks for winner and sends game state to DB
+  board = readBoard();
+  winner = checkForWin();
   $.post('/random/board', {
     board : board,
     gameID : gameCounter,
