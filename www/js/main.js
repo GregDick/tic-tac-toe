@@ -5,7 +5,7 @@ var $playAgain    = $('#playAgain');
 var winner = null;
 var turn   = 'X';
 var board  = readBoard();
-var numberOfGames = 10;
+var numberOfGames = 1;
 var gameCounter   = 0;
 var turnCounter   = 0;
 
@@ -13,19 +13,20 @@ var turnCounter   = 0;
 
 function game () {
   if(winner){
-    // userGameOver(winner);
+    // userGameOver();
     gameCounter++;
+    highlightWin();
     loopGame();
   }else{
     turnCounter++;
     //based on turn, allow for user to click or make a call to opponent API
     if(turn === 'X'){
-      expertTurn();
-      // randomTurn();
+      // aiTurn('expert');
+      aiTurn('novice');
       // userTurn();
     }else{
-      // randomTurn();
-      expertTurn();
+      aiTurn('expert');
+      // aiTurn('novice');
       // userTurn();
     }
   }
@@ -74,7 +75,7 @@ function readBoard () {
 }
 
 //play ball
-// game();
+game();
 
 
 // ===================== PLAYERS ========================
@@ -91,9 +92,10 @@ function userTurn () {
   });
 }
 
-function randomTurn () {
+function aiTurn (level) {
+  var pathName = `/${level}`;
   $squares.off(); // remove click handler from squares during opponent turn
-  $.get('/random', {board : board})
+  $.get(pathName, {board : board})
     .done(function(res){
       //make the move
       $($squares[res.move]).text(turn);
@@ -104,20 +106,6 @@ function randomTurn () {
     });
 }
 
-function expertTurn () {
-  $squares.off(); // remove click handler from squares during opponent turn
-  $.get('/expert', {board : board})
-    .done(function (res) {
-      //make the move
-      $($squares[res.move]).text(turn);
-      //switch turns
-      turn = turn === 'X' ? 'O' : 'X';
-      //calls game() when it is finished writing data
-      postBoard();
-    });
-}
-
-
 // ===================== AFTER GAME ========================
 
 function userGameOver () {
@@ -125,16 +113,11 @@ function userGameOver () {
   $squares.off();
   //if there is a winner, show winner and how they won
   if(winner.who){
-    //highlight winning move
-    $($squares[winner.how[0]]).addClass('win');
-    $($squares[winner.how[1]]).addClass('win');
-    $($squares[winner.how[2]]).addClass('win');
-    //display who won and playAgain button
     winner.who = winner.who === 1 ? 'X' : 'O';
-    $('.winner').append('<span class="h1">' + winner.who + ' wins!</span>');
+    $('.results').prepend('<span class="h1">' + winner.who + ' wins!</span>');
   }
   //either way append the playAgain button
-  $('.winner').append('<button id="playAgain" class="btn btn-default">Play Again?</button>');
+  $('.results').prepend('<button id="playAgain" class="btn btn-default">Play Again?</button>');
 }
 
 function resetGameValues () {
@@ -164,6 +147,7 @@ function loopGame () {
     resetGameValues();
     game();
   }else{
+    highlightWin();
     getResults();
   }
 }
@@ -174,7 +158,7 @@ function postBoard () {
   //reads board, checks for winner and sends game state to DB
   board = readBoard();
   winner = checkForWin();
-  $.post('/random/board', {
+  $.post('/results', {
     board : board,
     gameID : gameCounter,
     boardID : turnCounter,
@@ -187,16 +171,25 @@ function postBoard () {
 
 function getResults () {
   //calls /results for a SQL query to get all the data from the past loop
-  $.get('/random/results', function (response) {
+  $.get('/results', function (response) {
     console.log(response);
-    $('.winner').append('<h1>Winning Percentage of '+ response.total +' Games</h1>');
+    $('.results').append('<h3>Winning Percentage of '+ response.total +' Games</h3>');
     createChart(response);
   });
 }
 
+function highlightWin () {
+  //highlight winning move
+  if(winner.who){
+    $($squares[winner.how[0]]).addClass('win');
+    $($squares[winner.how[1]]).addClass('win');
+    $($squares[winner.how[2]]).addClass('win');
+  }
+}
+
 function createChart (response) {
   // Get context with jQuery - using jQuery's .get() method.
-  var ctx = $("#results").get(0).getContext("2d");
+  var ctx = $("#stats").get(0).getContext("2d");
 
   data = [{
     value : response.xPercent,

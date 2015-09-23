@@ -3,7 +3,8 @@ var path = require('path');
 var router = express.Router();
 
 var ctrl = require(path.join(process.cwd(), '/app/game/controller'));
-var random = require(path.join(process.cwd(), '/app/game/random'));
+var results = require(path.join(process.cwd(), '/app/game/results'));
+var novice = require(path.join(process.cwd(), '/app/game/novice'));
 var expert = require(path.join(process.cwd(), '/app/game/expert'));
 
 router.get('/', ctrl.index);
@@ -14,13 +15,13 @@ router.get('/', ctrl.index);
 // });
 
 //gets a random move
-router.get('/random', random.move);
+router.get('/novice', novice.move);
 
 //stores current board in the Random table
-router.post('/random/board', random.save);
+router.post('/results', results.save);
 
 //gets the game results from the Random table
-router.get('/random/results', random.results);
+router.get('/results', results.query);
 
 //gets an expert move
 router.get('/expert', expert.move);

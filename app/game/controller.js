@@ -15,7 +15,7 @@ module.exports.index = function (req, res) {
     }
   });
   //make table
-  createRandom();
+  createTable();
   //render the main page
   res.render('views/index');
 };
@@ -24,15 +24,15 @@ module.exports.index = function (req, res) {
 
 //==========================SQL FUNCTIONS=========================
 
-function createRandom () {
-  client.query(`DROP TABLE IF EXISTS "Random"`, function (err) {
+function createTable () {
+  client.query(`DROP TABLE IF EXISTS "Results"`, function (err) {
     if(err){
       console.log(err);
     }else{
       console.log('dropped table');
     }
   });
-  client.query(`CREATE TABLE IF NOT EXISTS "Random"("boardID" VARCHAR(10) NOT NULL PRIMARY KEY,
+  client.query(`CREATE TABLE IF NOT EXISTS "Results"("boardID" VARCHAR(10) NOT NULL PRIMARY KEY,
     "gameID" INTEGER NOT NULL, "winner" INTEGER, "_0" INTEGER NOT NULL, "_1" INTEGER NOT NULL,
     "_2" INTEGER NOT NULL, "_3" INTEGER NOT NULL, "_4" INTEGER NOT NULL, "_5" INTEGER NOT NULL,
     "_6" INTEGER NOT NULL, "_7" INTEGER NOT NULL, "_8" INTEGER NOT NULL)`,

@@ -13,18 +13,40 @@ html
         .col-lg-6
           table#tableBoard.table.table-responsive
             tr
-              td#zero.square.board-top.board-left
-              td#one.square.board-top
-              td#two.square.board-top.board-right
+              td.square.board-top.board-left
+              td.square.board-top
+              td.square.board-top.board-right
             tr
-              td#three.square.board-left
-              td#four.square
-              td#five.square.board-right
+              td.square.board-left
+              td.square
+              td.square.board-right
             tr
-              td#six.square.board-bottom.board-left
-              td#seven.square.board-bottom
-              td#eight.square.board-bottom.board-right
+              td.square.board-bottom.board-left
+              td.square.board-bottom
+              td.square.board-bottom.board-right
         .col-lg-6.winner
-          canvas#results
-
+          .row
+            h3 X :
+            .radio
+              .form-group
+                label #[input#userX(type='radio' name='playerX' value='user' checked)] User
+              .form-group
+                label #[input#noviceX(type='radio' name='playerX' value='novice')] Novice Opponent
+              .form-group
+                label #[input#intermediateX(type='radio' name='playerX' value='intermediate')] Intermediate Opponent
+              .form-group
+                label #[input#expertX(type='radio' name='playerX' value='expert')] Expert Opponent
+            h3 O :
+            .radio
+              .form-group
+                label #[input#userO(type='radio' name='playerO' value='user')] User
+              .form-group
+                label #[input#noviceO(type='radio' name='playerO' value='novice')] Novice Opponent
+              .form-group
+                label #[input#intermediateO(type='radio' name='playerO' value='intermediate')] Intermediate Opponent
+              .form-group
+                label #[input#expertO(type='radio' name='playerO' value='expert' checked)] Expert Opponent
+          .row
+            .results
+            canvas#stats
     include partials/footer

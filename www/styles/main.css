@@ -2,6 +2,8 @@
   padding : 5%;
 }
 
+/*============================ BOARD STYLINGS =============================*/
+
 #tableBoard {
   max-width : 500px;
 }
@@ -39,50 +41,12 @@
   border-left : 2px solid #333 !important;
 }
 
-/*#zero {
-  border-width : 0 3px 3px 0;
-}
-
-#one {
-  border-width : 0 0 2px;
-  height : 149px;
-}
-
-#two {
-  border-width : 0 0 3px 3px;
-}
-
-#three {
-  border-width : 0 2px 0 0;
-  margin-right : 1px;
-}
-
-#four {
-  border-width : 2px;
-}
-
-#five {
-  border-width : 0 0 0 2px;
-  margin-left : 1px;
-}
-
-#six {
-  border-width : 3px 3px 0 0;
-}
-
-#seven {
-  border-width : 2px 0 0;
-  margin-top : 1px;
-}
-
-#eight {
-  border-width : 3px 0 0 3px;
-}*/
-
 .win{
   color : #1F9442;
   font-size : 7.5em;
 }
+
+/*============================ RESULTS STYLINGS =============================*/
 
 .winner {
   margin-top : 20px;
@@ -95,6 +59,23 @@
   margin : 0 0 10px 10%;
   padding-top : 0;
 }
+
+label {
+  font-size : 2em;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

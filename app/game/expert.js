@@ -4,9 +4,7 @@ var client = require(path.join(process.cwd(), '/www/lib/postgres'));
 
 module.exports.move = function (req, res) {
   var board = req.query.board;
-  // var board = ['0', '1', '0', '0', '0', '1', '-1', '-1', '1'];
   var choice = bestMoveAndScore(board, 0);
-  console.log(choice);
   res.send({move : choice.move});
 }
 
