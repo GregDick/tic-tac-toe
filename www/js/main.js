@@ -5,7 +5,7 @@ var $playAgain    = $('#playAgain');
 var winner = null;
 var turn   = 'X';
 var board  = readBoard();
-var numberOfGames = 1;
+var numberOfGames = 10;
 var gameCounter   = 0;
 var turnCounter   = 0;
 
