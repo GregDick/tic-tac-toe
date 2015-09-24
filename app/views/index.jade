@@ -28,26 +28,26 @@ html
           .row
             .btn-group#btn-group-X
               button.btn.btn-danger.dropdown-toggle(type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") X #[span.caret]
-              ul.dropdown-menu
-                li
-                  button#userX User
-                li
-                  button#noviceX Novice Opponent
-                li
-                  button#intermediateX Intermediate Opponent
-                li
-                  button#expertX Expert Opponent
+              ul.dropdown-menu.player-menu
+                li#userX
+                  button User
+                li#noviceX
+                  button Novice Computer
+                li#intermediateX
+                  button Intermediate Computer
+                li#expertX
+                  button Expert Computer
             .btn-group
               button.btn.btn-primary.dropdown-toggle(type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") O #[span.caret]
-              ul.dropdown-menu
-                li
-                  button#userO User
-                li
-                  button#noviceO Novice Opponent
-                li
-                  button#intermediateO Intermediate Opponent
-                li
-                  button#expertO Expert Opponent
+              ul.dropdown-menu.player-menu
+                li#userO
+                  button User
+                li#noviceO
+                  button Novice Computer
+                li#intermediateO
+                  button Intermediate Computer
+                li#expertO
+                  button Expert Computer
           .row
             h3#playerX X :
           .row
@@ -56,16 +56,14 @@ html
             .btn-group.loop
               button.btn.btn-warning.dropdown-toggle(type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") Loop #[span.caret]
               ul.dropdown-menu
-                li
-                  button#ten 10
-                li
-                  button#twenty-five 25
-                li
-                  button#fifty 50
+                li#ten
+                  button 10
+                li#twenty-five
+                  button 25
+                li#fifty
+                  button 50
           .row
-            button.btn.btn-success#play Play
+            button.btn.btn-success.disabled#play Play
         .col-lg-4
-          .row
-            .results
-            canvas#stats
+          canvas#stats
     include partials/footer

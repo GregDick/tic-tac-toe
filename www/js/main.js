@@ -1,7 +1,5 @@
 //jQuery selectors
 var $squares      = $('.square');
-var $playAgain    = $('#playAgain');
-
 //game variables
 var winner = null;
 var turn   = 'X';
@@ -9,6 +7,9 @@ var board  = readBoard();
 var numberOfGames = 10;
 var gameCounter   = 0;
 var turnCounter   = 0;
+//user interface variables
+var playerX;
+var playerO;
 
 // ===================== GAME ========================
 
@@ -22,13 +23,9 @@ function game () {
     turnCounter++;
     //based on turn, allow for user to click or make a call to opponent API
     if(turn === 'X'){
-      // aiTurn('expert');
-      aiTurn('novice');
-      // userTurn();
+      takeTurn(playerX);
     }else{
-      aiTurn('expert');
-      // aiTurn('novice');
-      // userTurn();
+      takeTurn(playerO);
     }
   }
 };
@@ -75,11 +72,15 @@ function readBoard () {
   return map;
 }
 
-//play ball
-game();
-
-
 // ===================== PLAYERS ========================
+
+function takeTurn (player) {
+  if(player === 'user'){
+    userTurn();
+  }else{
+    aiTurn(player);
+  }
+}
 
 function userTurn () {
   $squares.click(turn, function () {
@@ -109,17 +110,17 @@ function aiTurn (level) {
 
 // ===================== AFTER GAME ========================
 
-function userGameOver () {
-  //remove click handler from all squares
-  $squares.off();
-  //if there is a winner, show winner and how they won
-  if(winner.who){
-    winner.who = winner.who === 1 ? 'X' : 'O';
-    $('.results').prepend('<span class="h1">' + winner.who + ' wins!</span>');
-  }
-  //either way append the playAgain button
-  $('.results').prepend('<button id="playAgain" class="btn btn-default">Play Again?</button>');
-}
+// function userGameOver () {
+//   //remove click handler from all squares
+//   $squares.off();
+//   //if there is a winner, show winner and how they won
+//   if(winner.who){
+//     winner.who = winner.who === 1 ? 'X' : 'O';
+//     $('.results').prepend('<span class="h1">' + winner.who + ' wins!</span>');
+//   }
+//   //either way append the playAgain button
+//   $('.results').prepend('<button id="playAgain" class="btn btn-default">Play Again?</button>');
+// }
 
 function resetGameValues () {
   //clear all the board tiles
@@ -133,12 +134,12 @@ function resetGameValues () {
   board = readBoard();
 }
 
-//playAgain click handler
-$('.winner').on('click', '#playAgain', function () {
-  $('.winner').empty();
-  resetGameValues();
-  game();
-});
+// //playAgain click handler
+// $('.winner').on('click', '#playAgain', function () {
+//   $('.winner').empty();
+//   resetGameValues();
+//   game();
+// });
 
 // ===================== LOOP GAME========================
 
@@ -150,6 +151,9 @@ function loopGame () {
   }else{
     highlightWin();
     getResults();
+    if(playerX !== 'user' && playerO !== 'user'){
+      $('.loop button').removeClass('disabled');
+    }
   }
 }
 
@@ -211,7 +215,93 @@ function createChart (response) {
 
 
 
-// ===================== USER INTERFACE ========================
+// ================================ USER INTERFACE ========================
+
+
+//=============================== CHOOSE A PLAYER
+$('#userX').click(function () {
+  $('#playerX').text('X : User');
+  playerX = 'user';
+});
+
+$('#noviceX').click(function () {
+  $('#playerX').text('X : Novice Computer');
+  playerX = 'novice';
+});
+
+$('#intermediateX').click(function () {
+  $('#playerX').text('X : Intermediate Computer');
+  playerX = 'intermediate';
+});
+
+$('#expertX').click(function () {
+  $('#playerX').text('X : Expert Computer');
+  playerX = 'expert';
+});
+
+$('#userO').click(function () {
+  $('#playerO').text('O : User');
+  playerO = 'user';
+});
+
+$('#noviceO').click(function () {
+  $('#playerO').text('O : Novice Computer');
+  playerO = 'novice';
+});
+
+$('#intermediateO').click(function () {
+  $('#playerO').text('O : Intermediate Computer');
+  playerO = 'intermediate';
+});
+
+$('#expertO').click(function () {
+  $('#playerO').text('O : Expert Computer');
+  playerO = 'expert';
+});
+
+//===============================
+
+$('.player-menu').click(function () {
+  //change button disability each time a player is chosen
+  buttonAbility();
+})
+
+function buttonAbility () {
+  //change button disability based on who's playing
+  if(playerX && playerO){
+    $('#play').removeClass('disabled');
+  }
+
+  if(playerX === 'user' || playerO === 'user'){
+    $('.loop button').addClass('disabled');
+    numberOfGames = 1;
+  }else{
+    $('.loop button').removeClass('disabled');
+  }
+}
+
+$('#ten').click(function () {
+  numberOfGames = 10;
+});
+
+$('#twenty-five').click(function () {
+  numberOfGames = 25;
+});
+
+$('#fifty').click(function () {
+  numberOfGames = 50;
+});
+
+//===============================
+
+$('#play').click(function () {
+  if(!$('.loop button').hasClass('disabled')){
+    $('.loop button').addClass('disabled');
+  }
+  gameCounter = 0;
+  resetGameValues();
+  game();
+})
 
 
 
