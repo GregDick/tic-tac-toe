@@ -1,6 +1,7 @@
 //jQuery selectors
 var $squares      = $('.square');
 var $playAgain    = $('#playAgain');
+
 //game variables
 var winner = null;
 var turn   = 'X';
@@ -133,7 +134,7 @@ function resetGameValues () {
 }
 
 //playAgain click handler
-$('.winner').on('click', 'button', function () {
+$('.winner').on('click', '#playAgain', function () {
   $('.winner').empty();
   resetGameValues();
   game();
@@ -208,6 +209,9 @@ function createChart (response) {
   new Chart(ctx).Doughnut(data);
 }
 
+
+
+// ===================== USER INTERFACE ========================
 
 
 

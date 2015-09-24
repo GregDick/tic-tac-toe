@@ -8,9 +8,9 @@ html
     link(rel='stylesheet' href='styles/main.css')
     title TicTacToe
   body
-    .container
+    .container-fluid
       .row
-        .col-lg-6
+        .col-lg-5
           table#tableBoard.table.table-responsive
             tr
               td.square.board-top.board-left
@@ -24,28 +24,47 @@ html
               td.square.board-bottom.board-left
               td.square.board-bottom
               td.square.board-bottom.board-right
-        .col-lg-6.winner
+        .col-lg-3.winner
           .row
-            h3 X :
-            .radio
-              .form-group
-                label #[input#userX(type='radio' name='playerX' value='user' checked)] User
-              .form-group
-                label #[input#noviceX(type='radio' name='playerX' value='novice')] Novice Opponent
-              .form-group
-                label #[input#intermediateX(type='radio' name='playerX' value='intermediate')] Intermediate Opponent
-              .form-group
-                label #[input#expertX(type='radio' name='playerX' value='expert')] Expert Opponent
-            h3 O :
-            .radio
-              .form-group
-                label #[input#userO(type='radio' name='playerO' value='user')] User
-              .form-group
-                label #[input#noviceO(type='radio' name='playerO' value='novice')] Novice Opponent
-              .form-group
-                label #[input#intermediateO(type='radio' name='playerO' value='intermediate')] Intermediate Opponent
-              .form-group
-                label #[input#expertO(type='radio' name='playerO' value='expert' checked)] Expert Opponent
+            .btn-group#btn-group-X
+              button.btn.btn-danger.dropdown-toggle(type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") X #[span.caret]
+              ul.dropdown-menu
+                li
+                  button#userX User
+                li
+                  button#noviceX Novice Opponent
+                li
+                  button#intermediateX Intermediate Opponent
+                li
+                  button#expertX Expert Opponent
+            .btn-group
+              button.btn.btn-primary.dropdown-toggle(type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") O #[span.caret]
+              ul.dropdown-menu
+                li
+                  button#userO User
+                li
+                  button#noviceO Novice Opponent
+                li
+                  button#intermediateO Intermediate Opponent
+                li
+                  button#expertO Expert Opponent
+          .row
+            h3#playerX X :
+          .row
+            h3#playerO O :
+          .row
+            .btn-group.loop
+              button.btn.btn-warning.dropdown-toggle(type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") Loop #[span.caret]
+              ul.dropdown-menu
+                li
+                  button#ten 10
+                li
+                  button#twenty-five 25
+                li
+                  button#fifty 50
+          .row
+            button.btn.btn-success#play Play
+        .col-lg-4
           .row
             .results
             canvas#stats
