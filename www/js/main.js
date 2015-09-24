@@ -77,8 +77,10 @@ function readBoard () {
 function takeTurn (player) {
   if(player === 'user'){
     userTurn();
-  }else{
+  }else if(player === 'novice' || player === 'expert'){
     aiTurn(player);
+  }else{
+    intermediateTurn();
   }
 }
 
@@ -106,6 +108,12 @@ function aiTurn (level) {
       //calls game() when it is finished writing data
       postBoard();
     });
+}
+
+function intermediateTurn () {
+  var coinToss = Math.floor(Math.random() * 2);
+  var skillLevel = coinToss ? 'novice' : 'expert';
+  aiTurn(skillLevel);
 }
 
 // ===================== AFTER GAME ========================
@@ -175,6 +183,7 @@ function postBoard () {
 }
 
 function getResults () {
+  $('.results').empty();
   //calls /results for a SQL query to get all the data from the past loop
   $.get('/results', function (response) {
     console.log(response);

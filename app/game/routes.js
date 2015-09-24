@@ -17,13 +17,13 @@ router.get('/', ctrl.index);
 //gets a random move
 router.get('/novice', novice.move);
 
+//gets an expert move
+router.get('/expert', expert.move);
+
 //stores current board in the Random table
 router.post('/results', results.save);
 
 //gets the game results from the Random table
 router.get('/results', results.query);
-
-//gets an expert move
-router.get('/expert', expert.move);
 
 module.exports = router;

@@ -14,8 +14,10 @@ module.exports.index = function (req, res) {
       console.log('connected');
     }
   });
-  //make table
-  createTable();
+  //make all time table
+  createAllTime();
+  //make results table
+  createResults();
   //render the main page
   res.render('views/index');
 };
@@ -24,7 +26,7 @@ module.exports.index = function (req, res) {
 
 //==========================SQL FUNCTIONS=========================
 
-function createTable () {
+function createResults () {
   client.query(`DROP TABLE IF EXISTS "Results"`, function (err) {
     if(err){
       console.log(err);
@@ -40,11 +42,21 @@ function createTable () {
       if(err){
         console.log(err);
       }else{
-        console.log('table created');
+        console.log('results table created');
       }
   });
 };
 
+function createAllTime () {
+  var tableString = `CREATE TABLE IF NOT EXISTS "AllTime"("boardID" VARCHAR(10) NOT NULL PRIMARY KEY,
+    "gameID" INTEGER NOT NULL, "winner" INTEGER, "playerX" VARCHAR(20) NOT NULL, "playerO" VARCHAR(20) NOT NULL)`;
+  client.query(tableString,
+    function (err) {
+      if(err){
+        console.log(err);
+      }
+  });
+}
 
 
 

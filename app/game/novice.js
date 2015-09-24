@@ -1,5 +1,3 @@
-var path = require('path');
-
 module.exports.move = function (req, res) {
   //read board and put in DB
   var board = req.query.board;
