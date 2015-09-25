@@ -1,7 +1,3 @@
-var path = require('path');
-var _ = require('lodash');
-var client = require(path.join(process.cwd(), '/www/lib/postgres'));
-
 module.exports.move = function (req, res) {
   var board = req.query.board;
   var choice = bestMoveAndScore(board, 0);

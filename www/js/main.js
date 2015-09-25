@@ -118,18 +118,6 @@ function intermediateTurn () {
 
 // ===================== AFTER GAME ========================
 
-// function userGameOver () {
-//   //remove click handler from all squares
-//   $squares.off();
-//   //if there is a winner, show winner and how they won
-//   if(winner.who){
-//     winner.who = winner.who === 1 ? 'X' : 'O';
-//     $('.results').prepend('<span class="h1">' + winner.who + ' wins!</span>');
-//   }
-//   //either way append the playAgain button
-//   $('.results').prepend('<button id="playAgain" class="btn btn-default">Play Again?</button>');
-// }
-
 function resetGameValues () {
   //clear all the board tiles
   $squares.each(function (i, square) {
@@ -141,13 +129,6 @@ function resetGameValues () {
   turn = 'X';
   board = readBoard();
 }
-
-// //playAgain click handler
-// $('.winner').on('click', '#playAgain', function () {
-//   $('.winner').empty();
-//   resetGameValues();
-//   game();
-// });
 
 // ===================== LOOP GAME========================
 
@@ -191,6 +172,9 @@ function getResults () {
     createChart(response);
   });
 }
+
+
+// ================================ DISPLAY DATA ========================
 
 function highlightWin () {
   //highlight winning move
