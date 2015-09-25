@@ -10,6 +10,7 @@ var turnCounter   = 0;
 //user interface variables
 var playerX;
 var playerO;
+var resultsDonut;
 
 // ===================== GAME ========================
 
@@ -202,7 +203,12 @@ function createChart (response) {
     label : 'Ties'
   }];
 
-  new Chart(ctx).Doughnut(data);
+  if(resultsDonut){
+    //wipe out old chart
+    resultsDonut.destroy();
+  }
+
+  resultsDonut = new Chart(ctx).Doughnut(data);
 }
 
 
@@ -295,7 +301,7 @@ $('#play').click(function () {
   $.get('/dropAdd')
     .done(function () {
       game();
-    })
+    });
 })
 
 
