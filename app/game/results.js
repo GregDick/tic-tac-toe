@@ -10,12 +10,13 @@ module.exports.start = function (req, res) {
 };
 
 module.exports.dropAdd = function (req, res) {
-  dropResults();
-  //make results table
-  createResults(function () {
-    // query is finished
-    console.log('results table created');
-    res.end();
+  dropResults(function () {
+    // only create results if drop is finished
+    createResults(function () {
+      // query is finished
+      console.log('results table created');
+      res.end();
+    });
   });
 }
 
@@ -25,9 +26,10 @@ module.exports.save = function (req, res) {
   var gameID  = req.body.gameID;
   var winner  = req.body.winner;
   //insert data
-  logGameState(board, boardID, gameID, winner);
-  //send a quick empty response
-  res.end();
+  logGameState(board, boardID, gameID, winner, function () {
+    //send a quick empty response
+    res.end();
+  });
 }
 
 module.exports.query = function (req, res) {
@@ -58,7 +60,7 @@ function createResults (cb) {
   });
 };
 
-function dropResults () {
+function dropResults (cb) {
   var queryText = `DROP TABLE IF EXISTS "Results"`;
 
   query(queryText, null, function (err, rows, result) {
@@ -66,6 +68,7 @@ function dropResults () {
       console.log('drop results error', err);
     }else{
       console.log('results table dropped');
+      cb();
     }
   });
 }
@@ -81,7 +84,7 @@ function createAllTime () {
   });
 }
 
-function logGameState (board, boardID, gameID, winner) {
+function logGameState (board, boardID, gameID, winner, cb) {
   var columns = "";
   board.forEach(function (space, i) {
     columns += `, _${i}`;
@@ -98,6 +101,8 @@ function logGameState (board, boardID, gameID, winner) {
   query(queryText, queryValues, function (err, rows, result) {
     if(err){
       console.log('results insert error', err);
+    }else{
+      cb();
     }
   });
 };

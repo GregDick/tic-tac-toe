@@ -4,7 +4,7 @@ var $squares      = $('.square');
 var winner = null;
 var turn   = 'X';
 var board  = readBoard();
-var numberOfGames = 10;
+var numberOfGames = 1;
 var gameCounter   = 0;
 var turnCounter   = 0;
 //user interface variables
@@ -133,7 +133,7 @@ function resetGameValues () {
 
 function loopGame () {
   //loop until gameCounter exceeds numberOfGames
-  if(gameCounter <= numberOfGames){
+  if(gameCounter < numberOfGames){
     resetGameValues();
     game();
   }else{
@@ -272,16 +272,16 @@ function buttonAbility () {
   }
 }
 
+$('#one').click(function () {
+  numberOfGames = 1;
+});
+
+$('#five').click(function () {
+  numberOfGames = 5;
+});
+
 $('#ten').click(function () {
   numberOfGames = 10;
-});
-
-$('#twenty-five').click(function () {
-  numberOfGames = 25;
-});
-
-$('#fifty').click(function () {
-  numberOfGames = 50;
 });
 
 //===============================
