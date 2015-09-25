@@ -6,6 +6,7 @@
 
 #tableBoard {
   max-width : 500px;
+  margin-left : 50px;
 }
 
 .table>tbody>tr>td {

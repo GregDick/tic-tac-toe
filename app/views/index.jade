@@ -10,20 +10,6 @@ html
   body
     .container-fluid
       .row
-        .col-lg-5
-          table#tableBoard.table.table-responsive
-            tr
-              td.square.board-top.board-left
-              td.square.board-top
-              td.square.board-top.board-right
-            tr
-              td.square.board-left
-              td.square
-              td.square.board-right
-            tr
-              td.square.board-bottom.board-left
-              td.square.board-bottom
-              td.square.board-bottom.board-right
         .col-lg-3.winner
           .row
             .btn-group#btn-group-X
@@ -64,6 +50,20 @@ html
                   button 10
           .row
             button.btn.btn-success.disabled#play Play
+        .col-lg-5
+          table#tableBoard.table.table-responsive
+            tr
+              td.square.board-top.board-left
+              td.square.board-top
+              td.square.board-top.board-right
+            tr
+              td.square.board-left
+              td.square
+              td.square.board-right
+            tr
+              td.square.board-bottom.board-left
+              td.square.board-bottom
+              td.square.board-bottom.board-right
         .col-lg-4
           .results
           canvas#stats
