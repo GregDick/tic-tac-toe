@@ -9,7 +9,6 @@ var app = module.exports = express();
 if(process.env.NODE_ENV !== 'production'){
   require(path.join(process.cwd(), '/www/lib/secrets'));
 }
-require(path.join(process.cwd(), '/www/lib/postgres'));
 
 app.set('views', __dirname);
 

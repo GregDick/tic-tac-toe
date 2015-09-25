@@ -9,6 +9,9 @@ var expert = require(path.join(process.cwd(), '/app/game/expert'));
 //renders page and creates tables
 router.get('/', results.start);
 
+//clears the results table
+router.get('/dropAdd', results.dropAdd);
+
 //gets a random move
 router.get('/novice', novice.move);
 

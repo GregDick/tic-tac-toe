@@ -5,13 +5,19 @@ var query = require(path.join(process.cwd(), '/www/lib/query'));
 module.exports.start = function (req, res) {
   //make all time table
   createAllTime();
-  //drop results if exists
-  dropResults();
-  //make results table
-  createResults();
   //render the main page
   res.render('views/index');
 };
+
+module.exports.dropAdd = function (req, res) {
+  dropResults();
+  //make results table
+  createResults(function () {
+    // query is finished
+    console.log('results table created');
+    res.end();
+  });
+}
 
 module.exports.save = function (req, res) {
   var board   = req.body.board;
@@ -37,7 +43,7 @@ module.exports.query = function (req, res) {
 
 //==========================SQL FUNCTIONS=========================
 
-function createResults () {
+function createResults (cb) {
   var queryText = `CREATE TABLE IF NOT EXISTS "Results"("boardID" VARCHAR(10) NOT NULL PRIMARY KEY,
     "gameID" INTEGER NOT NULL, "winner" INTEGER, "_0" INTEGER NOT NULL, "_1" INTEGER NOT NULL,
     "_2" INTEGER NOT NULL, "_3" INTEGER NOT NULL, "_4" INTEGER NOT NULL, "_5" INTEGER NOT NULL,
@@ -47,7 +53,7 @@ function createResults () {
     if(err){
       console.log('create results error', err);
     }else{
-      console.log('results table created');
+      cb();
     }
   });
 };
@@ -85,42 +91,31 @@ function logGameState (board, boardID, gameID, winner) {
   //creates unique primary key based on gameID and board ID
   var unique = '"_' + gameID + '-' + boardID + '"';
   //concatenates all the values into an array for the parameterized query
-  var values = [unique, gameID, winner].concat(board);
+  var queryValues = [unique, gameID, winner].concat(board);
 
-  var queryString = `INSERT INTO "Results"("boardID", "gameID", "winner"${columns}) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);`;
+  var queryText = `INSERT INTO "Results"("boardID", "gameID", "winner"${columns}) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);`;
 
-  client.query(queryString, values, function(err){
-    done();
+  query(queryText, queryValues, function (err, rows, result) {
     if(err){
-      console.log(err);
+      console.log('results insert error', err);
     }
   });
 };
 
 function getWinningPercent (cb) {
-  var selectString = `SELECT (SELECT COUNT("winner") FROM "Results" WHERE "winner"=$1) AS "xWins",
+  var queryText = `SELECT (SELECT COUNT("winner") FROM "Results" WHERE "winner"=$1) AS "xWins",
     (SELECT COUNT("winner") FROM "Results" WHERE "winner"=$2) AS "oWins",
     (SELECT COUNT("winner") FROM "Results" WHERE "winner"=$3) AS "ties",
     (SELECT COUNT("winner") FROM "Results" WHERE "winner" IS NOT NULL) AS "total"`;
-  client.query(selectString, [1, -1, 0], function (err, result) {
-    done();
-    if(err){
-      console.log(err);
-    }else{
-      cb(result.rows[0]);
-    }
-  });
-}
+  var queryValues = [1, -1, 0];
 
-function getAll () {
-  var queryString = `SELECT * FROM "Results" WHERE "winner" = $1`;
-  client.query(queryString, [1], function(err, result){
-    done();
+  query(queryText, queryValues, function (err, rows, result) {
     if(err){
-      console.log(err);
+      console.log('select win percent results error', err);
+    }else{
+      cb(rows[0]);
     }
-    console.log(result.rows);
-  });
+  })
 }
 
 

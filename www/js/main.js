@@ -15,7 +15,6 @@ var playerO;
 
 function game () {
   if(winner){
-    // userGameOver();
     gameCounter++;
     highlightWin();
     loopGame();
@@ -134,7 +133,7 @@ function resetGameValues () {
 
 function loopGame () {
   //loop until gameCounter exceeds numberOfGames
-  if(gameCounter < numberOfGames){
+  if(gameCounter <= numberOfGames){
     resetGameValues();
     game();
   }else{
@@ -293,7 +292,10 @@ $('#play').click(function () {
   }
   gameCounter = 0;
   resetGameValues();
-  game();
+  $.get('/dropAdd')
+    .done(function () {
+      game();
+    })
 })
 
 
