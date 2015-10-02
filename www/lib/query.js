@@ -1,4 +1,5 @@
 var pg = require('pg');
+pg.defaults.poolSize = 50;
 
 module.exports = function(queryText, queryValues, cb) {
   pg.connect(process.env.POSTGRES_URL, function(err, client, release) {

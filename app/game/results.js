@@ -1,5 +1,5 @@
 var path = require('path');
-// var client = require(path.join(process.cwd(), '/www/lib/postgres'));
+
 var query = require(path.join(process.cwd(), '/www/lib/query'));
 
 module.exports.start = function (req, res) {
@@ -40,6 +40,10 @@ module.exports.query = function (req, res) {
     result.tiePercent = 100 * result.ties / result.total;
     res.send(result);
   });
+}
+
+module.exports.addToAllTime = function (req, res) {
+  // body...
 }
 
 
