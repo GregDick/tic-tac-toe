@@ -11,6 +11,8 @@ var turnCounter   = 0;
 var playerX;
 var playerO;
 var resultsDonut;
+//database variables
+var uniqueTableName;
 
 // ===================== GAME ========================
 
@@ -152,21 +154,24 @@ function postBoard () {
   //reads board, checks for winner and sends game state to DB
   board = readBoard();
   winner = checkForWin();
-  $.post('/results', {
-    board : board,
-    gameID : gameCounter,
-    boardID : turnCounter,
-    winner : winner
-  })
-    .done(function () {
-      game();
-    });
+  if (winner) {
+    $.post('/results', {
+      tableName : uniqueTableName,
+      gameID : gameCounter,
+      winner : winner
+    })
+      .done(function () {
+        game();
+      });
+  }else{
+    game();
+  }
 }
 
 function getResults () {
   $('.results').empty();
   //calls /results for a SQL query to get all the data from the past loop
-  $.get('/results', function (response) {
+  $.get('/results', {tableName : uniqueTableName}, function (response) {
     console.log(response);
     $('.results').append('<h3>Winning Percentage of '+ response.total +' Games</h3>');
     createChart(response);
@@ -298,7 +303,8 @@ $('#play').click(function () {
   }
   gameCounter = 0;
   resetGameValues();
-  $.get('/dropAdd')
+  uniqueTableName = '_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+  $.post('/createSessionTable', {tableName : uniqueTableName})
     .done(function () {
       game();
     });

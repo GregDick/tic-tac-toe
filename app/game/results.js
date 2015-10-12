@@ -20,24 +20,34 @@ module.exports.dropAdd = function (req, res) {
   });
 }
 
+module.exports.createSessionTable = function (req, res) {
+  var tableName = req.body.tableName;
+  createUniqueTable(tableName, function () {
+    console.log('session table created');
+    res.end();
+  })
+}
+
 module.exports.save = function (req, res) {
-  var board   = req.body.board;
-  var boardID = req.body.boardID;
+  var tableName = req.body.tableName;
   var gameID  = req.body.gameID;
-  var winner  = req.body.winner;
+  var winner  = req.body.winner.who * 1;
   //insert data
-  logGameState(board, boardID, gameID, winner, function () {
+  logWinner(tableName, gameID, winner, function () {
     //send a quick empty response
     res.end();
   });
 }
 
 module.exports.query = function (req, res) {
+  var tableName = req.query.tableName;
+  console.log('node tableName', tableName);
   // view the results of gameplay
-  getWinningPercent(function (result) {
+  getWinningPercent(tableName, function (result) {
     result.xPercent = 100 * result.xWins / result.total;
     result.oPercent = 100 * result.oWins / result.total;
     result.tiePercent = 100 * result.ties / result.total;
+    dropUniqueTable(tableName);
     res.send(result);
   });
 }
@@ -64,6 +74,19 @@ function createResults (cb) {
   });
 };
 
+function createUniqueTable (tableName, cb) {
+  var queryText = `CREATE TABLE IF NOT EXISTS "${tableName}"("gameID" INTEGER NOT NULL PRIMARY KEY,
+    "winner" INTEGER NOT NULL)`;
+
+  query(queryText, null, function (err, rows, result) {
+    if(err){
+      console.log('create unique error', err);
+    }else{
+      cb();
+    }
+  });
+}
+
 function dropResults (cb) {
   var queryText = `DROP TABLE IF EXISTS "Results"`;
 
@@ -73,6 +96,18 @@ function dropResults (cb) {
     }else{
       console.log('results table dropped');
       cb();
+    }
+  });
+}
+
+function dropUniqueTable (tableName) {
+  var queryText = `DROP TABLE IF EXISTS "${tableName}"`;
+
+  query(queryText, null, function (err, rows, result) {
+    if(err){
+      console.log('drop unique error', err);
+    }else{
+      console.log('unique table dropped');
     }
   });
 }
@@ -111,16 +146,29 @@ function logGameState (board, boardID, gameID, winner, cb) {
   });
 };
 
-function getWinningPercent (cb) {
-  var queryText = `SELECT (SELECT COUNT("winner") FROM "Results" WHERE "winner"=$1) AS "xWins",
-    (SELECT COUNT("winner") FROM "Results" WHERE "winner"=$2) AS "oWins",
-    (SELECT COUNT("winner") FROM "Results" WHERE "winner"=$3) AS "ties",
-    (SELECT COUNT("winner") FROM "Results" WHERE "winner" IS NOT NULL) AS "total"`;
+function logWinner (tableName, gameID, winner, cb) {
+  var queryText = `INSERT INTO "${tableName}"("gameID", "winner") VALUES($1, $2)`;
+  var queryValues = [gameID, winner];
+
+  query(queryText, queryValues, function (err, rows, result) {
+    if(err){
+      console.log('session insert error', err);
+    }else{
+      cb();
+    }
+  });
+}
+
+function getWinningPercent (tableName, cb) {
+  var queryText = `SELECT (SELECT COUNT("winner") FROM "${tableName}" WHERE "winner"=$1) AS "xWins",
+    (SELECT COUNT("winner") FROM "${tableName}" WHERE "winner"=$2) AS "oWins",
+    (SELECT COUNT("winner") FROM "${tableName}" WHERE "winner"=$3) AS "ties",
+    (SELECT COUNT(*) FROM "${tableName}") AS "total"`;
   var queryValues = [1, -1, 0];
 
   query(queryText, queryValues, function (err, rows, result) {
     if(err){
-      console.log('select win percent results error', err);
+      console.log('winning percentage of session error', err);
     }else{
       cb(rows[0]);
     }

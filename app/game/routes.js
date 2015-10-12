@@ -10,7 +10,7 @@ var expert = require(path.join(process.cwd(), '/app/game/expert'));
 router.get('/', results.start);
 
 //clears the results table
-router.get('/dropAdd', results.dropAdd);
+router.post('/createSessionTable', results.createSessionTable);
 
 //gets a random move
 router.get('/novice', novice.move);
